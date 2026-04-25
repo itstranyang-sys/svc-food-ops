@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SVC Food Ops</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; color: #111; font-size: 14px; }
+
+  /* Layout */
+  #app { display: flex; height: 100vh; }
+
+  /* Sidebar */
+  #sidebar { width: 210px; min-width: 210px; background: #0f1117; display: flex; flex-direction: column; padding: 16px 0; }
+  .sidebar-logo { padding: 0 16px 20px; display: flex; align-items: center; gap: 8px; }
+  .sidebar-logo-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; }
+  .sidebar-logo-text { color: #fff; font-size: 13px; font-weight: 600; }
+  .sidebar-section { padding: 0 12px 6px; margin-top: 4px; }
+  .sidebar-section-label { color: #4a5568; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 4px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 16px; cursor: pointer; border-radius: 6px; margin: 2px 8px; transition: background 0.1s; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); }
+  .nav-item.active { background: rgba(245,158,11,0.14); }
+  .nav-item.active .nav-label { color: #fff; }
+  .nav-label { color: #a0a8b8; font-size: 13px; }
+  .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-bottom { margin-top: auto; }
+
+  /* Main */
+  #main { flex: 1; overflow-y: auto; background: #f3f4f6; }
+  .view { display: none; padding: 28px 32px; }
+  .view.active { display: block; }
+
+  /* Header */
+  .view-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; }
+  .view-title { font-size: 20px; font-weight: 600; color: #111; }
+  .view-subtitle { font-size: 13px; color: #6b7280; margin-top: 3px; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.88; }
+  .btn-primary { background: #f59e0b; color: #000; }
+  .btn-secondary { background: #fff; color: #374151; border: 1px solid #d1d5db; }
+  .btn-sm { padding: 6px 11px; font-size: 12px; }
+
+  /* Cards */
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; }
+  .card-body { padding: 18px 20px; }
+
+  /* Menu grid */
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .menu-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+  .menu-card:hover { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
+  .menu-card.selected { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
+  .menu-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .menu-card-name { font-size: 14px; font-weight: 600; color: #111; }
+  .menu-card-badge { font-size: 11px; color: #6b7280; background: #f3f4f6; padding: 2px 8px; border-radius: 4px; }
+  .menu-card-desc { font-size: 12px; color: #6b7280; }
+
+  /* Detail panel */
+  #menu-detail { display: none; }
+  .detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+  .detail-title { font-size: 16px; font-weight: 600; color: #111; }
+  .detail-meta { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .serving-control { display: flex; align-items: center; gap: 10px; }
+  .serving-control label { font-size: 13px; color: #6b7280; }
+  .serving-control input { width: 75px; font-size: 14px; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; text-align: center; }
+  .serving-control input:focus { outline: none; border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { border-bottom: 1px solid #e5e7eb; }
+  th { text-align: left; padding: 9px 12px; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  td { padding: 10px 12px; font-size: 13px; color: #374151; border-bottom: 1px solid #f3f4f6; }
+  tr:last-child td { border-bottom: none; }
+  .qty-changed { color: #d97706; font-weight: 600; }
+  .qty-bump { color: #dc2626; font-weight: 600; } /* ran-short flag */
+
+  /* Tags */
+  .tag { display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+  .tag-warn { background: #fef3c7; color: #92400e; }
+  .tag-ok { background: #d1fae5; color: #065f46; }
+  .tag-danger { background: #fee2e2; color: #991b1b; }
+  .tag-info { background: #dbeafe; color: #1e40af; }
+
+  /* Form elements */
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; font-weight: 500; color: #374151; display: block; margin-bottom: 5px; }
+  .form-input, .form-select, .form-textarea { width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 7px; background: #fff; color: #111; font-family: inherit; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
+  .form-textarea { resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* Feedback log */
+  .feedback-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+  .feedback-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .feedback-menu-name { font-size: 13px; font-weight: 600; color: #111; }
+  .feedback-meta { font-size: 12px; color: #6b7280; }
+  .feedback-notes { font-size: 13px; color: #4b5563; line-height: 1.55; margin-top: 6px; }
+
+  /* Schedule */
+  .schedule-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .schedule-date { font-size: 13px; font-weight: 600; color: #111; }
+  .schedule-menu { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .schedule-controls { display: flex; align-items: center; gap: 8px; }
+
+  /* Order view */
+  .order-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 20px; border-bottom: 1px solid #f3f4f6; }
+  .order-item:last-child { border-bottom: none; }
+  .order-item-left { display: flex; align-items: center; gap: 10px; }
+  .order-item-name { font-size: 13px; color: #111; }
+  .order-item-right { display: flex; align-items: center; gap: 14px; }
+  .order-qty { font-size: 13px; font-weight: 600; color: #111; }
+  .order-store { font-size: 11px; color: #9ca3af; background: #f9fafb; padding: 2px 7px; border-radius: 4px; }
+
+  /* Toast */
+  #toast { position: fixed; bottom: 24px; right: 24px; background: #111; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; z-index: 999; }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Checkbox */
+  input[type="checkbox"] { width: 15px; height: 15px; accent-color: #f59e0b; cursor: pointer; }
+
+  /* Difficulty */
+  .diff-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  .diff-btn { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px; border: 1px solid #d1d5db; background: #f9fafb; color: #6b7280; cursor: pointer; transition: opacity 0.1s; }
+  .diff-btn:hover { opacity: 0.78; }
+  .diff-btn.active-easy    { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+  .diff-btn.active-medium  { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+  .diff-btn.active-hard    { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+  .diff-btn.active-special { background: #ede9fe; color: #5b21b6; border-color: #c4b5fd; }
+
+  /* Filter bar */
+  .filter-btn { font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 6px; border: 1px solid #d1d5db; background: #fff; color: #6b7280; cursor: pointer; transition: all 0.1s; }
+  .filter-btn:hover { border-color: #f59e0b; color: #111; }
+  .filter-btn.active-filter { background: #f59e0b; color: #000; border-color: #f59e0b; }
+
+  /* Filter dropdown */
+  .filter-dropdown { position: relative; }
+  .filter-trigger { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 13px; font-weight: 500; border: 1px solid #d1d5db; border-radius: 7px; background: #fff; color: #374151; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .filter-trigger:hover { border-color: #f59e0b; }
+  .filter-trigger.has-filter { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+  .filter-trigger-chevron { font-size: 10px; color: #9ca3af; transition: transform 0.15s; }
+  .filter-trigger.open .filter-trigger-chevron { transform: rotate(180deg); }
+  .filter-panel { display: none; position: absolute; top: calc(100% + 6px); left: 0; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); min-width: 200px; z-index: 50; padding: 6px; }
+  .filter-panel.open { display: block; }
+  .filter-section-label { font-size: 10px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; padding: 6px 8px 4px; }
+  .filter-option { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; font-size: 13px; color: #374151; cursor: pointer; transition: background 0.1s; }
+  .filter-option:hover { background: #f9fafb; }
+  .filter-option.active { background: #fffbeb; color: #92400e; font-weight: 500; }
+  .filter-option .filter-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .filter-divider { border: none; border-top: 1px solid #f3f4f6; margin: 4px 0; }
+
+  /* Stat cards */
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px; }
+  .stat-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; }
+  .stat-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 600; color: #111; }
+  .stat-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+  @media (max-width: 640px) {
+    #sidebar { width: 56px; min-width: 56px; }
+    .nav-label, .sidebar-logo-text, .sidebar-section-label { display: none; }
+    .view { padding: 18px 16px; }
+    .menu-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-dot"></div>
+      <span class="sidebar-logo-text">SVC Food Ops</span>
+    </div>
+    <div class="sidebar-section">
+      <p class="sidebar-section-label">Workspace</p>
+    </div>
+    <div class="nav-item active" id="nav-menus" onclick="showView('menus')">
+      <span class="nav-icon">▦</span>
+      <span class="nav-label">Menu Library</span>
+    </div>
+    <div class="nav-item" id="nav-order" onclick="showView('order')">
+      <span class="nav-icon">🛒</span>
+      <span class="nav-label">Costco Order</span>
+    </div>
+    <div class="nav-item" id="nav-feedback" onclick="showView('feedback')">
+      <span class="nav-icon">✎</span>
+      <span class="nav-label">Service Feedback</span>
+    </div>
+    <div class="nav-item" id="nav-schedule" onclick="showView('schedule')">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">Monthly Schedule</span>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-section">
+        <p class="sidebar-section-label">Info</p>
+      </div>
+      <div class="nav-item" onclick="showHowItWorks()">
+        <span class="nav-icon">?</span>
+        <span class="nav-label">How It Works</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+
+    <!-- MENU LIBRARY -->
+    <div id="view-menus" class="view active">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Menu Library</div>
+          <div class="view-subtitle">Select a menu, adjust servings, and quantities scale automatically.</div>
+        </div>
+        <button class="btn btn-primary" onclick="openAddMenu()">+ Add Menu</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="position:relative;flex:1;min-width:180px;max-width:300px;">
+          <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:13px;pointer-events:none;">🔍</span>
+          <input type="text" id="menu-search" placeholder="Search menus…" oninput="renderMenuCards()" style="width:100%;padding:7px 10px 7px 30px;font-size:13px;border:1px solid #d1d5db;border-radius:7px;font-family:inherit;color:#111;background:#fff;" onfocus="this.style.borderColor='#f59e0b';this.style.boxShadow='0 0 0 3px rgba(245,158,11,0.15)'" onblur="this.style.borderColor='#d1d5db';this.style.boxShadow='none'" />
+        </div>
+        <div class="filter-dropdown" id="filter-dropdown">
+          <button class="filter-trigger" id="filter-trigger" onclick="toggleFilterPanel(event)">
+            <span>⚙ Filter: </span><span id="filter-label">All</span>
+            <span class="filter-trigger-chevron">▾</span>
+          </button>
+          <div class="filter-panel" id="filter-panel">
+            <div class="filter-section-label">Difficulty</div>
+            <div class="filter-option active" data-filter="all" onclick="setFilter('all')"><span class="filter-dot" style="background:#d1d5db;"></span>All menus</div>
+            <div class="filter-option" data-filter="easy" onclick="setFilter('easy')"><span class="filter-dot" style="background:#34d399;"></span>Easy</div>
+            <div class="filter-option" data-filter="medium" onclick="setFilter('medium')"><span class="filter-dot" style="background:#fbbf24;"></span>Medium</div>
+            <div class="filter-option" data-filter="hard" onclick="setFilter('hard')"><span class="filter-dot" style="background:#f87171;"></span>Hard</div>
+            <div class="filter-option" data-filter="special" onclick="setFilter('special')"><span class="filter-dot" style="background:#a78bfa;"></span>Special occasion</div>
+            <div class="filter-option" data-filter="unset" onclick="setFilter('unset')"><span class="filter-dot" style="background:#e5e7eb;border:1px solid #d1d5db;"></span>Unset</div>
+            <hr class="filter-divider" />
+            <div class="filter-section-label">Type</div>
+            <div class="filter-option" data-filter="catered" onclick="setFilter('catered')"><span class="filter-dot" style="background:#60a5fa;"></span>Catered</div>
+          </div>
+        </div>
+      </div>
+      <div id="menu-cards" class="menu-grid"></div>
+      <div id="menu-detail" class="card">
+        <div class="card-body">
+          <div class="detail-header">
+            <div>
+              <div id="detail-title" class="detail-title"></div>
+              <div id="detail-meta" class="detail-meta"></div>
+            </div>
+            <div class="serving-control">
+              <label>Servings:</label>
+              <input type="number" id="serving-input" min="10" max="1000" value="180" step="1" oninput="updateServings()" />
+              <button class="btn btn-primary btn-sm" onclick="showAISuggestions()">⚡ AI Adjust</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Store</th>
+                  <th>Ingredient</th>
+                  <th style="text-align:center;">Base Qty</th>
+                  <th style="text-align:center;">Adjusted Qty</th>
+                  <th>Unit</th>
+                  <th>Prep Notes</th>
+                  <th>Flag</th>
+                </tr>
+              </thead>
+              <tbody id="ingredient-table"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="sendToOrder()">Send to Costco Order</button>
+            <button class="btn btn-secondary btn-sm" onclick="editCurrentMenu()">Edit Menu</button>
+            <button class="btn btn-secondary btn-sm" onclick="copyForSheetFromLibrary()">📋 Copy for Sheet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COSTCO ORDER -->
+    <div id="view-order" class="view">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Costco Order</div>
+          <div class="view-subtitle">Thursday order checklist. Check off items as you add them to the cart.</div>
+        </div>
+        <button class="btn btn-primary" onclick="printOrder()">🖨 Print / Copy</button>
+      </div>
+      <div id="order-stats" class="stat-row"></div>
+      <div class="card">
+        <div style="padding:14px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:14px;font-weight:600;color:#111;">This Sunday's Order</span>
+          <span id="order-menu-label" style="font-size:12px;color:#6b7280;">No menu selected</span>
+        </div>
+        <div id="order-items"></div>
+      </div>
+      <div id="order-empty" style="display:none;padding:40px;text-align:center;color:#9ca3af;font-size:13px;">
+        No menu selected. Go to Menu Library, pick a menu, and click "Send to Costco Order".
+      </div>
+    </div>
+
+    <!-- SERVICE FEEDBACK -->
+    <div id="view-feedback" class="view">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Service Feedback</div>
+          <div class="view-subtitle">Log what worked and what ran short. Drives future quantity adjustments.</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Sunday Date</label>
+              <input type="date" id="fb-date" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Menu Served</label>
+              <select id="fb-menu" class="form-select">
+                <option value="">Select menu...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Actual Attendance</label>
+              <input type="number" id="fb-attendance" class="form-input" placeholder="e.g. 175" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Overall Rating</label>
+              <select id="fb-rating" class="form-select">
+                <option value="">Select...</option>
+                <option value="great">Great — had plenty of leftovers</option>
+                <option value="perfect">Perfect — just right</option>
+                <option value="tight">Tight — barely enough</option>
+                <option value="short">Ran short on some items</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes (what ran out, what was too much, any other observations)</label>
+            <textarea id="fb-notes" class="form-textarea" rows="3" placeholder="e.g. The salad ran out quickly for 180 people. Need at least 20% more Spring Mix next time. Hot dogs were perfect."></textarea>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="saveFeedback()">Save Feedback</button>
+            <button class="btn btn-secondary" onclick="aiFromFeedback()">AI Adjust from Feedback</button>
+          </div>
+        </div>
+      </div>
+      <div id="feedback-log"></div>
+    </div>
+
+    <!-- MONTHLY SCHEDULE -->
+    <div id="view-schedule" class="view">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Monthly Schedule</div>
+          <div class="view-subtitle">Assign menus to upcoming Sundays. Plan ahead so ordering is always on time.</div>
+        </div>
+        <button class="btn btn-primary" onclick="addScheduleWeek()">+ Add Sunday</button>
+      </div>
+      <div id="schedule-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Add / Edit Menu Modal -->
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;width:90%;max-width:680px;max-height:90vh;overflow-y:auto;padding:24px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <h2 id="modal-title" style="font-size:16px;font-weight:600;">Add Menu</h2>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;">×</button>
+    </div>
+    <div class="form-row" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label class="form-label">Menu Name</label>
+        <input type="text" id="modal-name" class="form-input" placeholder="e.g. Chili Cheese Hot Dogs" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <input type="text" id="modal-desc" class="form-input" placeholder="Short description" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label class="form-label">Base Serving Size</label>
+      <input type="number" id="modal-servings" class="form-input" value="180" style="width:100px;" />
+    </div>
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <label class="form-label" style="margin:0;">Ingredients</label>
+        <button class="btn btn-secondary btn-sm" onclick="addIngredientRow()">+ Add Row</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:1px solid #e5e7eb;">
+            <th style="text-align:left;padding:6px 8px;font-size:11px;color:#6b7280;">Store</th>
+            <th style="text-align:left;padding:6px 8px;font-size:11px;color:#6b7280;">Ingredient</th>
+            <th style="text-align:center;padding:6px 8px;font-size:11px;color:#6b7280;">Qty</th>
+            <th style="text-align:left;padding:6px 8px;font-size:11px;color:#6b7280;">Unit</th>
+            <th style="text-align:left;padding:6px 8px;font-size:11px;color:#6b7280;">Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="modal-ingredients"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px;">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMenu()">Save Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Print overlay -->
+<div id="print-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;width:96%;max-width:640px;max-height:88vh;overflow-y:auto;padding:24px;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <h2 style="font-size:15px;font-weight:600;">Copy for Google Sheet</h2>
+        <p style="font-size:12px;color:#6b7280;margin-top:2px;">Preview below. Hit copy then paste into your Google Sheet.</p>
+      </div>
+      <button onclick="closePrint()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;margin-left:12px;">×</button>
+    </div>
+
+    <!-- Tab switcher removed — sheet copy only -->
+
+    <!-- Sheet preview table -->
+    <div id="sheet-preview" style="margin-bottom:12px;overflow-x:auto;border:1px solid #e5e7eb;border-radius:7px;">
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+          <tr style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
+            <th style="padding:7px 10px;text-align:left;color:#6b7280;font-weight:600;white-space:nowrap;">meal</th>
+            <th style="padding:7px 10px;text-align:left;color:#6b7280;font-weight:600;white-space:nowrap;">item_category</th>
+            <th style="padding:7px 10px;text-align:left;color:#6b7280;font-weight:600;">item</th>
+            <th style="padding:7px 10px;text-align:left;color:#6b7280;font-weight:600;">sample_item (link)</th>
+            <th style="padding:7px 10px;text-align:left;color:#6b7280;font-weight:600;white-space:nowrap;">quantity_expected</th>
+          </tr>
+        </thead>
+        <tbody id="sheet-preview-body"></tbody>
+      </table>
+    </div>
+
+    <textarea id="print-text" style="display:none;" readonly></textarea>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button id="copy-btn" class="btn btn-primary" onclick="copySheet()">Copy Rows for Google Sheet</button>
+      <button class="btn btn-secondary" onclick="closePrint()">Close</button>
+    </div>
+    <p style="font-size:11px;color:#9ca3af;margin-top:8px;" id="copy-hint">Tab-separated rows → paste straight into your Google Sheet (Ctrl+V / Cmd+V)</p>
+  </div>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+// Version bump — clears old cached menus so new full list loads
+const DATA_VERSION = '14';
+if (localStorage.getItem('svc_data_version') !== DATA_VERSION) {
+  localStorage.removeItem('svc_menus');
+  localStorage.setItem('svc_data_version', DATA_VERSION);
+}
+
+let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
+  {
+    id: 'chili-dogs', name: 'Chili Cheese Hot Dogs', desc: 'Costco hot dogs with Stagg chili, cheese, and salad sides',
+    baseServings: 180, catered: false, difficulty: 'easy',
+    prepInstructions: `HOT DOGS\n- Put hot dogs into 4 rice cookers and oven roasters with some water and cook\n- Set aside toppings (shredded cheese, diced onions) into trays\n\nSALAD\n- Grab 5 clear trays\n- Cut English cucumbers (half moon)\n- Cut cherry tomatoes (long way)\n- Set up Spring Mix in trays\n\nA2K\n- Cook Aidells Chicken Sausage in the small 10-cup rice pot`,
+    ingredients: [
+      { store:'Costco', name:'Stagg Premium Country Brand Chili', baseQty:6, unit:'cans', notes:'Heat in rice cooker', flagShort:false, url:'https://www.costcobusinessdelivery.com/stagg-premium-country-brand-chili-with-beans,-%2310-can,-6-lbs-12-oz%C2%A0.product.10178549.html' },
+      { store:'Costco', name:'Shredded Cheese', baseQty:2, unit:'5lb bags', notes:'Optional topping', flagShort:false },
+      { store:'Costco', name:'Chips', baseQty:3, unit:'50ct boxes', notes:'', flagShort:false },
+      { store:'Costco', name:'Hot Dogs (Kirkland Dinner Franks)', baseQty:15, unit:'packs', packSize:14, packUnit:'pack (14 links)', notes:'Put in 4 rice cookers', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-beef-dinner-franks,-costcos-14-lb-plus,-14-links,-3.81-lbs.product.11467741.html' },
+      { store:'Costco', name:'Hot Dog Buns (Franz Classic)', baseQty:9, unit:'bags', packSize:24, packUnit:'bag (24 buns)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/franz-hot-dog-buns,-classic,-24-ct.product.100238062.html' },
+      { store:'Costco', name:'Diced Onions', baseQty:1, unit:'tubs', notes:'Dice smaller', flagShort:false },
+      { store:'Costco', name:'Spring Mix', baseQty:5, unit:'boxes (3lb)', notes:'Salad — watch stock', flagShort:true, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
+      { store:'Costco', name:'English Cucumbers', baseQty:2, unit:'3-packs', notes:'Cut half moon', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
+      { store:'Costco', name:'Grape Tomatoes', baseQty:2, unit:'boxes (2lb)', notes:'Cut long way', flagShort:false, url:'https://www.costcobusinessdelivery.com/grape-tomatoes,-clamshell,-2-lbs.product.10181893.html' },
+      { store:'Costco', name:'Aidells Smoked Chicken Sausage', baseQty:1, unit:'packs', notes:'For A2K group (small rice cooker)', flagShort:false },
+    ]
+  },
+  {
+    id: 'chicken-tortilla', name: 'Chicken Tortilla Soup', desc: 'Soup with toppings bar — chicken broth, beans, corn, tomatoes',
+    baseServings: 180, catered: false, difficulty: 'easy',
+    prepInstructions: `SOUP\n- Combine chicken broth (6 cases = 36 cups / 1,152 fl oz), diced tomatoes, black beans, corn in rice cookers\n- Add shredded cooked chicken (72 cups total)\n- Add lime juice (2.25 cups = 36 Tbsp), chopped cilantro (12 cups)\n- Add tomato chicken bouillon to taste\n- Simmer until hot\n\nTOPPINGS BAR\n- Set out sour cream, shredded cheese, tortilla chips, salsa in separate trays\n\nSALAD (optional)\n- Spring Mix with cucumber and tomato`,
+    ingredients: [
+      { store:'Costco', name:'Chicken Broth (Swanson, 12ct)', baseQty:6, unit:'cases', packSize:12, packUnit:'case (12 cans)', notes:'9 cans = 36 cups total', flagShort:false, url:'https://www.costcobusinessdelivery.com/swanson-natural-goodness-chicken-broth,-less-sodium,-14.5-oz,-12-ct.product.100122115.html' },
+      { store:'Costco', name:'Canned Diced Tomatoes (Kirkland, 8ct)', baseQty:9, unit:'cans', packSize:8, packUnit:'case (8 cans, 14.5oz each)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-organic-diced-tomatoes,-14.5-oz-package,-8-ct.product.100082419.html' },
+      { store:'Costco', name:'Black Beans (Goya, 8ct)', baseQty:5, unit:'cases', packSize:8, packUnit:'case (8 cans, 15.5oz each)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/goya-black-beans,-15.5-oz-can,-8-ct.product.100275469.html' },
+      { store:'Costco', name:'Shredded Cooked Chicken (46oz pack)', baseQty:10, unit:'packs', notes:'72 cups total', flagShort:false, url:'https://www.costcobusinessdelivery.com/rotisserie-chicken-breast-meat,-46-oz.product.11975863.html' },
+      { store:'Costco', name:'Canned Corn (Del Monte, 12ct)', baseQty:2, unit:'cases', packSize:12, packUnit:'case (12 cans, 15.25oz each)', notes:'54 cups corn', flagShort:false, url:'https://www.costco.com/p/-/del-monte-canned-corn-whole-kernel-1525-oz-12-count/100443694' },
+      { store:'Costco', name:'Lime Juice', baseQty:1, unit:'bottle', notes:'2.25 cups (36 Tbsp)', flagShort:false },
+      { store:'Costco', name:'Cilantro Leaves', baseQty:1, unit:'lb', notes:'12 cups chopped', flagShort:false },
+      { store:'Walsh', name:'Tomato Chicken Bouillon', baseQty:1, unit:'to taste', notes:'Check Walsh', flagShort:false },
+      { store:'Costco', name:'Sour Cream (32lb tub)', baseQty:1, unit:'tubs', notes:'Optional for serving', flagShort:false, url:'https://www.costcobusinessdelivery.com/p/-/sour-cream-original-32-lbs/11023573' },
+      { store:'Costco', name:'Shredded Cheese (Cheswick, 5lb)', baseQty:1, unit:'bags', notes:'Optional for serving', flagShort:false, url:'https://www.costcobusinessdelivery.com/cheswick-sharp-cheddar-cheese,-shredded,-5-lbs.product.11954589.html' },
+      { store:'Costco', name:'Tortilla Chips (Kirkland, 40oz)', baseQty:1, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-organic-tortilla-chips,-40-oz.product.11987050.html' },
+      { store:'Costco', name:'Salsa', baseQty:1, unit:'jars', notes:'', flagShort:false },
+    ]
+  },
+  {
+    id: 'chicken-pot-pie-soup', name: 'Chicken Pot Pie Soup', desc: 'Hearty soup with potatoes, frozen veggies, cream of chicken, and Hawaiian rolls',
+    baseServings: 130, catered: false, difficulty: 'easy',
+    prepInstructions: `SOUP PREP\n- Bring out 3 rice pots + 2 roasters (6 things total)\n- Into each rice cooker pour:\n  · Potatoes (1 lab)\n  · 2 lbs of chicken\n  · Frozen vegetables (0.5 lb)\n  · Chicken broth (2 cartons)\n  · Cream of chicken (2-3 cans)\n  · Add water to the 30-cup line\n  · Cook and stir occasionally; add salt and pepper to taste\n- Into each roaster pour same as above\n\nBREAD\n- Set out Hawaiian rolls in trays\n\nSALAD\n- Cut cucumbers, cut tomatoes\n- Set out spring mix, cucumbers, and tomatoes in trays\n- Dress the salad before serving\n\nNOTE: Had ~2 packs of potatoes and 1.5 bags of frozen veggies leftover last time. About 95 people attended vs 130 estimated.`,
+    ingredients: [
+      { store:'Costco', name:'Pre-shredded Chicken', baseQty:10, unit:'count', notes:'', flagShort:false },
+      { store:'Costco', name:'Chicken Broth (Swanson)', baseQty:12, unit:'cans', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/swanson-natural-goodness-chicken-broth,-less-sodium,-14.5-oz,-12-ct.product.100122115.html' },
+      { store:'Costco', name:'Pre-cut Potatoes', baseQty:5, unit:'count (25lbs)', notes:'', flagShort:false },
+      { store:'Costco', name:'Bag Frozen Mixed Vegetables', baseQty:4, unit:'count (15 lbs)', notes:'', flagShort:false },
+      { store:'Safeway', name:'Cream of Chicken', baseQty:12, unit:'cans', notes:'', flagShort:false },
+      { store:'Costco', name:'Hawaiian Sweet Rolls', baseQty:10, unit:'count', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/p/-/kirkland-signature-sweet-hawaiian-rolls-36-count/100441835' },
+      { store:'Walsh', name:'Garlic Salt or Salt to taste', baseQty:1, unit:'to taste', notes:'Check Walsh', flagShort:false },
+      { store:'Walsh', name:'Chicken Bouillon', baseQty:1, unit:'to taste', notes:'Check Walsh; if not add salt and pepper', flagShort:false },
+      { store:'Costco', name:'Spring Mix', baseQty:5, unit:'boxes (3lb)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
+      { store:'Costco', name:'Cucumber', baseQty:2, unit:'3-packs', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
+      { store:'Costco', name:'Tomatoes', baseQty:2, unit:'boxes (2lb)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/grape-tomatoes,-clamshell,-2-lbs.product.10181893.html' },
+    ]
+  },
+  {
+    id: 'japanese-hotdogs', name: 'Japanese Hot Dogs', desc: 'Hot dogs with Japanese toppings — mayo, okayamami sauce, bonito flakes, furikake',
+    baseServings: 160, catered: false, difficulty: 'easy',
+    prepInstructions: `HOT DOGS\n- Put hot dogs into 4 rice cookers and oven roasters with some water and cook\n- Set aside toppings into trays: Japanese mayo, okayamami sauce, bonito flakes, furikake\n\nSALAD\n- Grab 5 clear trays\n- Cut English cucumbers (half moon)\n- Cut cherry tomatoes (long way)\n- Set spring mix in trays\n- Add Asian sesame dressing on the side\n- Optional: set out edamame\n\nA2K\n- Cook Aidells Chicken Sausage in small rice cooker\n\nNOTE: Last time had 10 hotdogs leftover but had to discard ~30 due to plastic issues. 2 boxes chips leftover. Less than 1 tray of salad leftover.`,
+    ingredients: [
+      { store:'Ranch 99', name:'Japanese Mayo', baseQty:3, unit:'bottles', notes:'', flagShort:false },
+      { store:'Ranch 99', name:'Okayamami Sauce', baseQty:3, unit:'bottles', notes:'', flagShort:false },
+      { store:'Ranch 99', name:'Bonito Flakes (katsuobushi)', baseQty:6, unit:'bags', notes:'', flagShort:false },
+      { store:'Costco', name:'Furikake', baseQty:4, unit:'jars', notes:'', flagShort:false },
+      { store:'Costco', name:'Hot Dogs (Kirkland Dinner Franks)', baseQty:13, unit:'packs', packSize:14, packUnit:'pack (14 links)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-beef-dinner-franks,-costcos-14-lb-plus,-14-links,-3.81-lbs.product.11467741.html' },
+      { store:'Costco', name:'Hot Dog Buns (Franz Classic)', baseQty:12, unit:'bags', packSize:24, packUnit:'bag (24 buns)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/franz-hot-dog-buns,-classic,-24-ct.product.100238062.html' },
+      { store:'Costco', name:'Aidells Smoked Chicken Sausage', baseQty:1, unit:'packs (15ct)', notes:'For A2K; cook in small rice cooker', flagShort:false },
+      { store:'Costco', name:'Spring Mix', baseQty:5, unit:'boxes (3lb)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
+      { store:'Costco', name:'English Cucumbers', baseQty:2, unit:'3-packs', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
+      { store:'Costco', name:'Grape Tomatoes', baseQty:2, unit:'boxes (2lb)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/grape-tomatoes,-clamshell,-2-lbs.product.10181893.html' },
+      { store:'Costco or Ranch 99', name:'Asian Sesame Dressing', baseQty:3, unit:'bottles', notes:'', flagShort:false },
+      { store:'Samart or Final', name:'Frozen Shelled Edamame', baseQty:5, unit:'bags', notes:'Optional', flagShort:false },
+      { store:'Costco', name:'Chips', baseQty:3, unit:'boxes (50ct)', notes:'', flagShort:false },
+    ]
+  },
+  {
+    id: 'pizza', name: 'Pizza', desc: 'Costco pizza (17 cheese + 17 pepperoni) with Caesar salad and fruit',
+    baseServings: 180, catered: false, difficulty: 'easy',
+    prepInstructions: `PIZZA\n- Order pizza from Costco (call ahead)\n- Pick up pizza day of\n\nSALAD (Caesar)\n- Grab 5 clear trays and line\n- Wash lettuce\n- Mix lettuce and spring mix\n- Add parmesan cheese\n- Add croutons (day of so they don't get soggy)\n- Add bacon bits\n- Caesar dressing on the side\n- Check Walsh freezer for leftover parmesan and croutons\n\nFRUIT\n- Arrange cara cara oranges, strawberries, blueberries, watermelon in trays`,
+    ingredients: [
+      { store:'Costco', name:'Cheese Pizza', baseQty:17, unit:'boxes', notes:'', flagShort:false },
+      { store:'Costco', name:'Pepperoni Pizza', baseQty:17, unit:'boxes', notes:'', flagShort:false },
+      { store:'Costco', name:'Parmesan Cheese', baseQty:2, unit:'pack', notes:'Check Walsh freezer for leftovers', flagShort:false },
+      { store:'Costco', name:'Croutons', baseQty:2, unit:'boxes', notes:'Check Walsh for leftovers', flagShort:false },
+      { store:'Costco', name:'Caesar Dressing', baseQty:1, unit:'count (6pc)', notes:'', flagShort:false },
+      { store:'Costco', name:'Bacon Bits', baseQty:3, unit:'count', notes:'Optional', flagShort:false },
+      { store:'Costco', name:'Spring Mix (3lb bag)', baseQty:5, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
+      { store:'Costco', name:'Cara Cara Oranges', baseQty:1, unit:'bag', notes:'', flagShort:false },
+      { store:'Costco', name:'Strawberries', baseQty:2, unit:'count', notes:'', flagShort:false },
+      { store:'Costco', name:'Blueberries', baseQty:4, unit:'ct', notes:'', flagShort:false },
+      { store:'Costco', name:'Watermelon', baseQty:2, unit:'ct', notes:'', flagShort:false },
+    ]
+  },
+  {
+    id: 'fried-roast-chicken', name: 'Fried and Roast Chicken Legs & Thighs', desc: 'Catered from Nob Hill — 8 trays (6 fried, 3 roasted, 48 pcs/tray). Rice and strawberry salad.',
+    baseServings: 180, catered: true, difficulty: 'easy',
+    cateringInfo: 'Order from: Campbell 408-379-6650 (3 rosted, 2 fried) @ 11am — need to bring own stacker cooler. Order from: Grant 650-390-9222, 1250 Grant Rd Mountain View (4 fried) @ 10:30am. Usually need to go in person to pay. Note: 2 pcs chicken per person.',
+    prepInstructions: `SALAD PREP\n- Cut cucumbers into half moon\n- Add strawberries as salad toppings\n- Put 1 salad box into a plastic tray (should be 4 trays of salad)\n- Top salad with cucumbers and strawberries\n\nRICE\n- Make rice (25 cups in 3 rice cookers + 10 cups for A2K)\n\nSALAD DRESSING\n- 2 cups white vinegar, 2 cups oil, 2 cups sugar, 5 tbsp soy sauce, 5 tbsp sesame oil, 2 tbsp black pepper\n\nFRUIT\n- Wash and arrange fruit in trays\n\nMISC\n- Assign someone to pick up food day of\n- Gather serving/eating utensils\n- Prep drinks / condiments / utensil stations\n\nPERUVIAN GREEN SAUCE (optional, ~100 servings)\n- 15 jalapeños, 2-3 bundles cilantro, 10 cloves garlic, 4 cups mayo, lime juice to taste, 3 tbsp white vinegar, 1/2 cup olive oil, salt and pepper\n- Blend on high speed until smooth. Repeat twice to make 100 servings.\n\nCHIMICHURRI (optional, ~150 servings)\n- 3 bundles cilantro, 12 cloves garlic, 3/4 cup lemon juice, 4.5 cups olive oil, parsley\n\nNOTE: Last time had too much chicken (~4 coolers). Accidentally ordered 3 more trays than needed from Nob Hill. Needed more salad.`,
+    ingredients: [
+      { store:'Nob Hill (catering)', name:'Fried & Roast Chicken Legs/Thighs', baseQty:8, unit:'trays (48 pcs/tray)', notes:'6 fried, 3 roasted. Call ahead. ~$622', flagShort:false },
+      { store:'Costco', name:'Spring Mix (3lb bag)', baseQty:6, unit:'bags', notes:'', flagShort:true, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
+      { store:'Costco', name:'Strawberries', baseQty:5, unit:'boxes', notes:'', flagShort:false },
+      { store:'Costco', name:'English Cucumbers (3-pack)', baseQty:3, unit:'packs', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
+      { store:'S&F', name:'Jalapeños', baseQty:30, unit:'count', notes:'For Peruvian sauce (optional)', flagShort:false },
+      { store:'S&F', name:'Cilantro', baseQty:5, unit:'bundles', notes:'Peruvian + Chimichurri sauce', flagShort:false },
+      { store:'Costco or S&F', name:'Garlic', baseQty:20, unit:'cloves', notes:'', flagShort:false },
+      { store:'S&F', name:'Mayo', baseQty:1, unit:'64oz', notes:'For Peruvian sauce', flagShort:false },
+      { store:'S&F', name:'Lime Juice', baseQty:1, unit:'bottle', notes:'To taste', flagShort:false },
+      { store:'S&F / Walsh', name:'White Vinegar', baseQty:1, unit:'bottle', notes:'', flagShort:false },
+      { store:'S&F / Walsh', name:'Olive Oil', baseQty:1, unit:'bottle', notes:'', flagShort:false },
+      { store:'Costco or S&F', name:'Garlic (Chimichurri)', baseQty:12, unit:'cloves', notes:'For Chimichurri (optional)', flagShort:false },
+      { store:'S&F', name:'Lemon Juice', baseQty:1, unit:'3/4 cup', notes:'', flagShort:false },
+      { store:'S&F / Walsh', name:'Olive Oil (Chimichurri)', baseQty:1, unit:'4.5 cups', notes:'', flagShort:false },
+      { store:'S&F', name:'Parsley', baseQty:1, unit:'bundle', notes:'', flagShort:false },
+      { store:'Costco', name:'Rice', baseQty:1, unit:'bag', notes:'25 cups in 3 cookers + 10 cups A2K', flagShort:false },
+    ]
+  },
+  {
+    id: 'meatball-subs', name: 'Meatball Subs', desc: 'Costco meatballs with Prego pasta sauce on hoagie rolls, with salad and pasta for A2K',
+    baseServings: 180, catered: false, difficulty: 'easy',
+    prepInstructions: `MEATBALL SUB PREP\n- Heat up thawed meatballs in rice cooker\n- Add pasta sauce (~1.5 bottles of sauce per rice cooker) and a little water\n- Prepare 4 stackable coolers with oven safe liners\n- Once meatballs are heated, pour into stacker coolers\n- Place hoagie rolls into aluminum trays with bag open\n- Prep mozzarella cheese into long skinny bins\n\nSALAD PREP\n- Put salad mixes into trays (1 per shallow tray) = 5 for SVC, 1 for A2K\n- Cut into half moons cucumbers and halve the cherry tomatoes\n- Prep salad dressing bins (2) + 1 more for A2K\n\nA2K PREP\n- Cook penne pasta and put in lined stacker cooler\n- Add pasta sauce to the pot\n- Once heated, cover with aluminum, place in sturdy metal tray, place in food warmer/cooler box\n- Prepare mozzarella into smaller bin for A2K pasta\n- Shred meatballs for babysitting/A2K food\n- Portion out meatballs (1/2 clear tray is good)\n- Prepare 1/2 tray with serving utensils: 4 tongs, 2 small spoons for cheese\n- Set aside along with 1 tray of salad and 1 bin of salad dressing\n\nNOTE: ~2 bags of meatballs per rice cooker. Last time: 4 pieces of bread leftover, only 2 gallon bags of meatballs — good estimate. Salad was all gone — could add one more tray.`,
+    ingredients: [
+      { store:'Costco', name:'Salad Mix (5lb bag)', baseQty:5, unit:'bags', notes:'', flagShort:true, url:'https://www.costcobusinessdelivery.com/salad-mix,-5-lbs.product.100084195.html' },
+      { store:'Costco', name:'Cherry Tomatoes (2lb clamshell)', baseQty:2, unit:'clamshells', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/grape-tomatoes,-clamshell,-2-lbs.product.10181893.html' },
+      { store:'Costco', name:'English Cucumbers (3-pack)', baseQty:2, unit:'packs', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
+      { store:'Costco', name:'Hoagie Rolls (Francisco, 12ct)', baseQty:10, unit:'bags', packSize:12, packUnit:'bag (12 rolls)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/francisco-gourmet-sesame-seed-hoagie-rolls,-12-ct.product.11091691.html' },
+      { store:'Costco', name:'Meatballs (Kirkland, 6lb ~140ct)', baseQty:10, unit:'bags', notes:'Check Walsh; ~2 bags per rice cooker', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-meatballs,-italian-style-beef,-6-lbs.product.10182018.html' },
+      { store:'Costco', name:'Mozzarella Cheese', baseQty:2, unit:'bags', notes:'Defrost before Sunday', flagShort:false },
+      { store:'Costco', name:'Prego Pasta Sauce (3-pack, 45oz each)', baseQty:4, unit:'3-packs', notes:'Check Walsh freezer; ~1.5 bottles per cooker', flagShort:false, url:'https://www.costcobusinessdelivery.com/prego-pasta-sauce,-traditional-lower-sodium,-45-oz,-3-ct.product.100373058.html' },
+      { store:'Smart and Final', name:'Penne Pasta', baseQty:5, unit:'boxes', notes:'For A2K food', flagShort:false },
+      { store:'Costco', name:'Potato Chips', baseQty:4, unit:'bags', notes:'', flagShort:false },
+    ]
+  },
+  {
+    id: 'yoshida-meatballs', name: 'Yoshida Meatballs', desc: 'Meatballs in Yoshida sauce served over rice with salad and edamame',
+    baseServings: 180, catered: false, difficulty: 'easy',
+    prepInstructions: `RICE\n- Make rice: 80 cups for service + 10 cups for A2K\n- 3 big rice cookers: 25, 25, 30\n\nMEATBALL PREP\n- Heat up thawed meatballs in rice pots\n- Prepare 4 stackable coolers with oven safe liners\n- Toss meatballs into coolers as they are warmed\n- Note: about 2 bags of meatballs per rice cooker\n- Repeat until all meatballs are heated\n\nYOSHIDA SAUCE\n- Heat up sauce in stock pot and add the pineapples (30 minutes)\n- Pour some of the sauce into the stacker cooler\n\nSALAD\n- Grab 5 clear trays\n- Add warm water to heat up the edamame (do not cook)\n- Combine cabbage, spring mix, edamame, and wonton strips into clear trays\n\nNOTE: Last time had about 3 gallon bags of rice and 3 gallon bags of meatballs leftover. 132 actual attendance vs 180 estimated.`,
+    ingredients: [
+      { store:'Costco', name:'Meatballs (Kirkland, 6lb ~140ct)', baseQty:10, unit:'bags', notes:'About 180 ppl; store in fridge', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-meatballs,-italian-style-beef,-6-lbs.product.10182018.html' },
+      { store:'Costco', name:'Spring Mix (3lb bag)', baseQty:5, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
+      { store:'Costco', name:'Mr. Yoshida\'s Sauce (86oz bottle)', baseQty:3, unit:'bottles', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/mr.-yoshidas-marinade-&-cooking-sauce,-original-gourmet,-86-oz.product.2001178720.html' },
+      { store:'Costco', name:'Rice', baseQty:1, unit:'bag', notes:'80 cups service + 10 cups A2K', flagShort:false },
+      { store:'Costco', name:'Aidells Smoked Chicken Sausage', baseQty:1, unit:'pack', notes:'For A2K', flagShort:false },
+    ]
+  },
+  {
+    id: 'burrito-bowls', name: 'MYO Burrito Bowls', desc: 'Catered meat from Las Palmas Mercado — build-your-own bowls with rice, beans, toppings',
+    baseServings: 150, catered: true, difficulty: 'medium',
+    cateringInfo: 'Las Palmas Mercado: 35 lbs carne asada (taco meat). Need Spanish speaker to order @ 11am. Also order from Costco Business for pork. Total last time: $863 ($574 Las Palmas + $289 Costco). Note: 20 lbs pollo asada is optional.',
+    prepInstructions: `MYO BURRITO BOWL TOPPINGS PREP\n- Drain the corn and beans → put into separate containers\n- Split up the cheese into containers\n- Put romaine lettuce into clear trays\n\nCOOK PORK\n- Cook pork in oven roasters\n\nMAKE RICE\n- 75 cups + 7 cups of plain rice for A2K\n- 25 cups of rice → 10 tablespoons of tomato chicken bouillon → put into rice before water\n\nPICO DE GALLO (optional)\n- Cut onions, cut tomatoes, add lime, add salt\n\nNOTE: Last time meat was too much — had tray of beef and 3 gallon bag of pork. UCSC was gone (~20 staff). Too much sour cream. Large clear deep tray of chips leftover. Next time maybe order less beef.`,
+    ingredients: [
+      { store:'Las Palmas Mercado (catering)', name:'Carne Asada (taco meat)', baseQty:35, unit:'lbs', notes:'Need Spanish speaker to order @ 11am. ~$574', flagShort:false },
+      { store:'Costco Business', name:'Diced Pork Adobada', baseQty:50, unit:'lbs', notes:'~$50 for 20 lbs. Ask Angela to order.', flagShort:false },
+      { store:'Costco or Smart & Final', name:'Shredded Iceberg Lettuce', baseQty:2, unit:'5lb bag', notes:'', flagShort:false },
+      { store:'Costco or Smart & Final', name:'Sour Cream', baseQty:3, unit:'tub (5 lbs)', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Smart and Final', name:'Shredded Mexican Cheese', baseQty:1, unit:'pack (2 count)', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Costco Business', name:'Black Beans', baseQty:1, unit:'case (8pk)', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Costco Business', name:'Canned Corn', baseQty:1, unit:'case (12 count)', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Costco Business', name:'Tortilla Chips', baseQty:1, unit:'bag (5 lbs)', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Costco Business', name:'Guac', baseQty:4, unit:'packs (15oz 3-count)', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Smart & Final', name:'Salsa', baseQty:1, unit:'pack (2 jugs)', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Smart & Final', name:'Tomato Chicken Bouillon', baseQty:1, unit:'bottle', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Costco Business', name:'Shallots', baseQty:1, unit:'count (3 lbs)', notes:'', flagShort:false },
+      { store:'Costco Business', name:'Tomatoes', baseQty:1, unit:'count (4 lbs)', notes:'', flagShort:false },
+      { store:'Costco Business', name:'Lime', baseQty:1, unit:'bag', notes:'', flagShort:false },
+      { store:'Costco Business', name:'Cilantro', baseQty:2, unit:'lbs', notes:'', flagShort:false },
+      { store:'Costco', name:'Rice', baseQty:1, unit:'bag', notes:'75 cups + 7 cups A2K', flagShort:false },
+    ]
+  },
+  {
+    id: 'pulled-pork-sub', name: 'Pulled Pork Sub', desc: 'Pulled pork with BBQ sauce, coleslaw on hoagie rolls with kettle chips',
+    baseServings: 150, catered: false, difficulty: 'easy',
+    prepInstructions: `PREP WORK (night before)\n- Defrost meatballs if needed\n\nMAKE RICE\n- Make 12 cups of rice\n- Line stacker coolers\n\nCOOK PORK\n- Microwave pork\n- Heat in the skillet\n\nCOLESLAW (at the end)\n- Set coleslaw in trays\n- Drizzle dressing towards the end of food prep\n\nBREAD\n- Line stacker coolers\n- Place hot dog buns in coolers → burger buns in tray\n\nA2K\n- Get 2-3 1/2 Al trays\n- Carve up the chicken\n- Heat up in oven @ 325 uncovered for 20-30 min\n- Cover until 10:30\n- Put 1/2 trays in metal trays and put in warmer\n\nYOSHIDA SAUCE\n- Make sauce (leftover from Walsh)\n\nMISC\n- Set up runner tables for outside with tape\n- Waters\n- Utensil baskets\n- Serving things in plastic bin\n\nNOTE: Food estimate was good. Had rice leftover for A2K.`,
+    ingredients: [
+      { store:'Costco', name:'Pulled Pork', baseQty:18, unit:'boxes', notes:'', flagShort:false },
+      { store:'Costco', name:'BBQ Sauce', baseQty:2, unit:'packs (2 bottles)', notes:'Check Walsh before buying', flagShort:false },
+      { store:'Costco', name:'Hoagie Rolls (Francisco, 12ct)', baseQty:10, unit:'bags', packSize:12, packUnit:'bag (12 rolls)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/francisco-gourmet-sesame-seed-hoagie-rolls,-12-ct.product.11091691.html' },
+      { store:'Smart and Final', name:'Coleslaw Salad', baseQty:3, unit:'bags (5lb)', notes:'', flagShort:false },
+      { store:'Smart and Final', name:'Coleslaw Dressing', baseQty:2, unit:'bottles (3.78L)', notes:'', flagShort:false },
+      { store:'Costco', name:'Kettle Chips', baseQty:4, unit:'bags', notes:'', flagShort:false },
+      { store:'Costco', name:'Rotisserie Chicken', baseQty:5, unit:'chickens', notes:'For A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/rotisserie-chicken,-8-ct.product.100455326.html' },
+      { store:'Walsh', name:'Yoshida Sauce', baseQty:1, unit:'leftover', notes:'Have leftover Yoshida at Walsh', flagShort:false },
+      { store:'Smart and Final', name:'Green Onion', baseQty:1, unit:'bunch', notes:'', flagShort:false },
+      { store:'Walsh', name:'Rice', baseQty:1, unit:'12 cups', notes:'', flagShort:false },
+      { store:'Costco', name:'Spring Mix', baseQty:1, unit:'box (3lb)', notes:'For A2K?', flagShort:false, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
+    ]
+  },
+  {
+    id: 'banh-mi', name: 'Banh Mi Sandwiches', desc: 'Catered from Banh Mi Oven — 90 beef, 60 pork, 30 chicken. Salad + A2K chicken/rice/broccoli.',
+    baseServings: 180, catered: true, difficulty: null,
+    cateringInfo: 'Banh Mi Oven: (408) 271-2877 · 1143 Story Rd Suite #196, San Jose. Promotion: Buy 5 get 1 free (bought 125, got 25 free). 90 beef, 60 pork, 30 chicken. NOTE: Pork disappeared faster than chicken. Get more pork next time (reverse pork and chicken sandwich #s). Order: 90 pork, 60 chicken, 30 beef.',
+    prepInstructions: `SALAD PREP\n- Cut cucumbers into half moon\n- Halve the cherry tomatoes for salad toppings\n- Put 1 salad box into a plastic tray (should be 4 trays of salad)\n- Top salad with cucumbers and cherry tomatoes\n\nMISC\n- Assign someone to pick up food day of\n- Gather serving utensils / eating utensils\n- Prep trays to lay out the Banh Mi sandwiches\n- Make signs to indicate the types (beef / pork / chicken)\n- Prep drinks / condiments / utensil stations\n\nA2K FOOD OPS (15 servings for kids)\n- Chicken Prep: Season chicken thighs with salt & pepper, coat each one with flour on both sides, cook chicken on a skillet, cut chicken into slices\n- Broccoli Prep: Oil, salt and pepper, bake for 30 minutes at 425°F\n- Make rice: 8 cups\n- Set aside serving utensils in a clear half bin\n\nNOTE: Salad disappeared quickly — people liked the miso dressing. Also provided leftover spaghetti from past Friday.`,
+    ingredients: [
+      { store:'Banh Mi Oven (catering)', name:'Banh Mi Sandwiches', baseQty:150, unit:'count (buy 125, get 25 free)', notes:'90 beef, 60 pork, 30 chicken. ~$968', flagShort:false },
+      { store:'Costco', name:'Spring Mix', baseQty:4, unit:'boxes (3lb)', notes:'', flagShort:true, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
+      { store:'Costco', name:'Cherry or Grape Tomatoes', baseQty:1, unit:'box (2lb)', notes:'Cut long way', flagShort:false, url:'https://www.costcobusinessdelivery.com/grape-tomatoes,-clamshell,-2-lbs.product.10181893.html' },
+      { store:'Costco', name:'English Cucumbers', baseQty:2, unit:'3-packs', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
+      { store:'Costco', name:'Chicken Thighs (boneless/skinless)', baseQty:8, unit:'lbs', packSize:6, packUnit:'6lb bag', notes:'For A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-chicken-tenderloins,-boneless-skinless,-6-lbs.product.100367403.html' },
+      { store:'Walsh', name:'Flour', baseQty:1, unit:'bag', notes:'For A2K chicken coating', flagShort:false },
+      { store:'Walsh', name:'Rice', baseQty:8, unit:'cups', notes:'For A2K', flagShort:false },
+      { store:'Costco', name:'Broccoli', baseQty:2, unit:'bags', notes:'For A2K', flagShort:false },
+    ]
+  },
+  {
+    id: 'popeyes-chicken', name: 'Chicken Sandwiches (Popeyes)', desc: 'Catered from Popeyes — 25 spicy + 25 classic (order from 2 locations). Caesar salad.',
+    baseServings: 150, catered: true, difficulty: null,
+    cateringInfo: 'Order from 2 locations to avoid overwhelming one: Popeyes Louisiana Kitchen (1) 1570 W San Carlos St, San Jose; (2) 1790 El Camino Real, Santa Clara. Order via ezcater.com/catering. 25 spicy + 25 classic = 50 per location. They gave us 25 extra. Also ordered more for SC service: 100 sandwiches, 2 boxes spinach, 1 more bag romaine.',
+    prepInstructions: `SALAD PREP (Caesar)\n- Cut romaine lettuce and wash and spin to dry\n- Mix the spinach with romaine\n- Top with shredded Parmigiano and croutons (day of so croutons don't get soggy in fridge)\n- Caesar dressing on the side\n\nMISC\n- Assign someone to pick up food day of\n- Gather serving utensils / eating utensils\n- Prep drinks / condiments / utensil stations\n\nSALAD DRESSING\n- 1 cup white vinegar, 1 cup oil, 1 cup sugar, ~3 tbsp soy sauce, ~3 tbsp sesame oil, 1 tbsp black pepper\n\nNOTE: Leftover sandwiches — may be due to extra they gave. Students also took some home. No salad leftover.`,
+    ingredients: [
+      { store:'Popeyes (catering)', name:'Chicken Sandwiches', baseQty:100, unit:'count (50 spicy, 50 classic)', notes:'Order via ezcater.com/catering. ~$902', flagShort:false },
+      { store:'Costco', name:'Spinach', baseQty:5, unit:'boxes (1lb)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/revol-greens-organic-spring-mix,-1-lb.product.100406636.html' },
+      { store:'Costco', name:'Romaine Lettuce', baseQty:3, unit:'bags (6ct)', notes:'', flagShort:false },
+      { store:'Costco', name:'Shredded Parmigiano', baseQty:2, unit:'boxes', notes:'', flagShort:false },
+      { store:'Costco', name:'Croutons', baseQty:2, unit:'bags', notes:'Add day-of so they stay crunchy', flagShort:false },
+      { store:'Smart & Final', name:'Caesar Dressing', baseQty:3, unit:'bottles', notes:'', flagShort:false },
+    ]
+  },
+];
+
+let feedbackLog = JSON.parse(localStorage.getItem('svc_feedback') || '[]');
+let scheduleData = JSON.parse(localStorage.getItem('svc_schedule') || 'null') || getDefaultSchedule();
+let selectedMenuId = null;
+let currentServings = 180;
+let editingMenuId = null;
+let orderMenuId = null;
+let orderServings = 180;
+
+function save() {
+  localStorage.setItem('svc_menus', JSON.stringify(menus));
+  localStorage.setItem('svc_feedback', JSON.stringify(feedbackLog));
+  localStorage.setItem('svc_schedule', JSON.stringify(scheduleData));
+}
+
+function getDefaultSchedule() {
+  const sundays = [];
+  const d = new Date();
+  d.setDate(d.getDate() + ((7 - d.getDay()) % 7 || 7));
+  for (let i = 0; i < 5; i++) {
+    const copy = new Date(d);
+    copy.setDate(copy.getDate() + i * 7);
+    sundays.push({ date: copy.toISOString().slice(0,10), menuId: null });
+  }
+  return sundays;
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+
+function showView(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  const nav = document.getElementById('nav-' + view);
+  if (nav) nav.classList.add('active');
+  if (view === 'order') renderOrder();
+  if (view === 'feedback') { populateFeedbackMenuSelect(); renderFeedbackLog(); }
+  if (view === 'schedule') renderSchedule();
+}
+
+// ── Menu Library ──────────────────────────────────────────────────────────────
+
+const DIFF_LEVELS = ['easy','medium','hard','special'];
+const DIFF_LABELS = { easy:'Easy', medium:'Medium', hard:'Hard', special:'Special occasion' };
+
+let activeFilter = 'all';
+
+const FILTER_LABELS = { all: 'All', easy: 'Easy', medium: 'Medium', hard: 'Hard', special: 'Special occasion', unset: 'Unset', catered: 'Catered' };
+
+function toggleFilterPanel(e) {
+  e.stopPropagation();
+  const trigger = document.getElementById('filter-trigger');
+  const panel = document.getElementById('filter-panel');
+  const open = panel.classList.toggle('open');
+  trigger.classList.toggle('open', open);
+}
+
+function setFilter(filter) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-option').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.filter === filter);
+  });
+  const trigger = document.getElementById('filter-trigger');
+  const label = document.getElementById('filter-label');
+  label.textContent = FILTER_LABELS[filter] || filter;
+  trigger.classList.toggle('has-filter', filter !== 'all');
+  document.getElementById('filter-panel').classList.remove('open');
+  trigger.classList.remove('open');
+  renderMenuCards();
+}
+
+document.addEventListener('click', () => {
+  document.getElementById('filter-panel')?.classList.remove('open');
+  document.getElementById('filter-trigger')?.classList.remove('open');
+});
+
+const DIFF_BADGE_STYLE = {
+  easy:    'background:#d1fae5;color:#065f46',
+  medium:  'background:#fef3c7;color:#92400e',
+  hard:    'background:#fee2e2;color:#991b1b',
+  special: 'background:#ede9fe;color:#5b21b6',
+};
+
+function renderDetailDifficulty(menu, editMode) {
+  let el = document.getElementById('detail-difficulty');
+  if (!el) return;
+  if (editMode) {
+    const btns = DIFF_LEVELS.map(l => {
+      const active = menu.difficulty === l ? `active-${l}` : '';
+      return `<button class="diff-btn ${active}" onclick="setDifficulty(event,'${menu.id}','${l}')">${DIFF_LABELS[l]}</button>`;
+    }).join('');
+    el.innerHTML = `<span style="font-size:12px;color:#9ca3af;">Difficulty:</span>${btns}<button onclick="renderDetailDifficulty(menus.find(m=>m.id==='${menu.id}'),false)" style="font-size:11px;padding:2px 8px;border:1px solid #d1d5db;border-radius:5px;background:#fff;cursor:pointer;color:#6b7280;margin-left:4px;">Close</button>`;
+  } else {
+    const badge = menu.difficulty
+      ? `<span style="font-size:11px;font-weight:500;padding:2px 9px;border-radius:4px;${DIFF_BADGE_STYLE[menu.difficulty]}">${DIFF_LABELS[menu.difficulty]}</span>`
+      : `<span style="font-size:12px;color:#9ca3af;font-style:italic;">Not set</span>`;
+    el.innerHTML = `<span style="font-size:12px;color:#9ca3af;">Difficulty:</span>${badge}<button onclick="renderDetailDifficulty(menus.find(m=>m.id==='${menu.id}'),true)" style="font-size:11px;padding:2px 8px;border:1px solid #d1d5db;border-radius:5px;background:#fff;cursor:pointer;color:#6b7280;margin-left:4px;">Edit</button>`;
+  }
+}
+
+function setDifficulty(event, menuId, level) {
+  event.stopPropagation();
+  const m = menus.find(m => m.id === menuId);
+  if (!m) return;
+  m.difficulty = (m.difficulty === level) ? null : level;
+  save();
+  renderMenuCards();
+  if (selectedMenuId === menuId) renderDetailDifficulty(m, false);
+}
+
+function renderMenuCards() {
+  const c = document.getElementById('menu-cards');
+  const query = (document.getElementById('menu-search')?.value || '').toLowerCase().trim();
+  const filtered = menus.filter(m => {
+    const matchesDiff = activeFilter === 'all'
+      ? true
+      : activeFilter === 'unset' ? !m.difficulty
+      : activeFilter === 'catered' ? !!m.catered
+      : m.difficulty === activeFilter;
+    const matchesSearch = !query || m.name.toLowerCase().includes(query);
+    return matchesDiff && matchesSearch;
+  });
+  if (!filtered.length) {
+    c.innerHTML = `<div style="grid-column:1/-1;padding:32px;text-align:center;color:#9ca3af;font-size:13px;">No menus match this filter.</div>`;
+    return;
+  }
+  c.innerHTML = filtered.map(m => {
+    const DIFF_COLORS = { easy:'#d1fae5;color:#065f46', medium:'#fef3c7;color:#92400e', hard:'#fee2e2;color:#991b1b', special:'#ede9fe;color:#5b21b6' };
+    const diffBadge = m.difficulty
+      ? `<span style="display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;background:${DIFF_COLORS[m.difficulty].split(';')[0]};${DIFF_COLORS[m.difficulty].split(';')[1]};">${DIFF_LABELS[m.difficulty]}</span>`
+      : '';
+    return `
+    <div class="menu-card ${selectedMenuId === m.id ? 'selected' : ''}" onclick="selectMenu('${m.id}')">
+      <div class="menu-card-header">
+        <span class="menu-card-name">${m.name}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${m.catered ? '<span style="font-size:10px;background:#dbeafe;color:#1e40af;padding:2px 7px;border-radius:4px;font-weight:600;">CATERED</span>' : ''}
+          <span class="menu-card-badge">${m.ingredients.length} items</span>
+        </div>
+      </div>
+      ${diffBadge ? `<div class="diff-row">${diffBadge}</div>` : ''}
+      <div class="menu-card-desc">${m.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectMenu(id) {
+  selectedMenuId = id;
+  const menu = menus.find(m => m.id === id);
+  currentServings = parseInt(document.getElementById('serving-input').value) || menu.baseServings;
+  document.getElementById('serving-input').value = menu.baseServings;
+  currentServings = menu.baseServings;
+  document.getElementById('detail-title').innerHTML = menu.name + (menu.catered ? ' <span style="font-size:11px;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:4px;font-weight:600;margin-left:6px;">CATERED</span>' : '');
+  document.getElementById('detail-meta').textContent = 'Base: ' + menu.baseServings + ' servings';
+
+  // Difficulty display in detail panel
+  let diffEditor = document.getElementById('detail-difficulty');
+  if (!diffEditor) {
+    diffEditor = document.createElement('div');
+    diffEditor.id = 'detail-difficulty';
+    diffEditor.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;';
+    document.getElementById('detail-meta').insertAdjacentElement('afterend', diffEditor);
+  }
+  renderDetailDifficulty(menu, false);
+  let cateringBanner = document.getElementById('catering-banner');
+  if (!cateringBanner) {
+    cateringBanner = document.createElement('div');
+    cateringBanner.id = 'catering-banner';
+    document.getElementById('detail-title').parentNode.parentNode.insertBefore(cateringBanner, document.getElementById('detail-title').parentNode.nextSibling);
+  }
+  if (menu.catered && menu.cateringInfo) {
+    cateringBanner.innerHTML = `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#1e40af;line-height:1.6;">📞 <strong>Catering Info:</strong> ${menu.cateringInfo}</div>`;
+  } else {
+    cateringBanner.innerHTML = '';
+  }
+
+  // Prep instructions
+  let prepSection = document.getElementById('prep-section');
+  if (!prepSection) {
+    prepSection = document.createElement('div');
+    prepSection.id = 'prep-section';
+    const detailCard = document.getElementById('menu-detail').querySelector('.card-body');
+    detailCard.appendChild(prepSection);
+  }
+  if (menu.prepInstructions) {
+    prepSection.innerHTML = `
+      <div style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <span style="font-size:13px;font-weight:600;color:#374151;">Prep Instructions</span>
+          <button onclick="togglePrep()" id="prep-toggle-btn" style="font-size:12px;padding:4px 10px;border:1px solid #d1d5db;border-radius:5px;background:#fff;cursor:pointer;color:#6b7280;">Show</button>
+        </div>
+        <pre id="prep-content" style="display:none;white-space:pre-wrap;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;color:#374151;line-height:1.7;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px;">${menu.prepInstructions}</pre>
+      </div>`;
+  } else {
+    prepSection.innerHTML = '';
+  }
+
+  document.getElementById('menu-detail').style.display = 'block';
+  renderIngredients(menu, currentServings);
+  renderMenuCards();
+  setTimeout(() => {
+    document.getElementById('menu-detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
+}
+
+function togglePrep() {
+  const content = document.getElementById('prep-content');
+  const btn = document.getElementById('prep-toggle-btn');
+  if (content.style.display === 'none') { content.style.display = 'block'; btn.textContent = 'Hide'; }
+  else { content.style.display = 'none'; btn.textContent = 'Show'; }
+}
+
+function updateServings() {
+  currentServings = Math.round(parseInt(document.getElementById('serving-input').value) || 180);
+  if (selectedMenuId) renderIngredients(menus.find(m => m.id === selectedMenuId), currentServings);
+}
+
+function isScalable(ing) {
+  // Only scale Costco items. Walsh, Ranch 99, Smart & Final, catering vendors stay fixed.
+  if (ing.scalable === false) return false;
+  if (ing.scalable === true) return true;
+  // Auto-detect by store name if not explicitly set
+  const fixed = ['walsh', 'ranch 99', 'smart and final', 'smart & final', 's&f', 's&f / walsh', 'safeway', 'samart or final', 'samart and final', 'catering', 'banh mi oven', 'popeyes', 'nob hill', 'las palmas'];
+  return !fixed.some(f => ing.store.toLowerCase().includes(f));
+}
+
+function calcBuy(ing, ratio) {
+  if (!isScalable(ing)) {
+    return { rawAdj: ing.baseQty, packsToBuy: null, hasPackSize: false, fixed: true };
+  }
+  const rawAdj = ing.baseQty * ratio;
+  if (ing.packSize && ing.packSize > 0) {
+    const packsNeeded = rawAdj / ing.packSize;
+    const packsToBuy = Math.ceil(packsNeeded);
+    return { rawAdj, packsToBuy, hasPackSize: true, fixed: false };
+  }
+  return { rawAdj, packsToBuy: null, hasPackSize: false, fixed: false };
+}
+
+function renderIngredients(menu, servings) {
+  const ratio = servings / menu.baseServings;
+  const tbody = document.getElementById('ingredient-table');
+  document.querySelector('#ingredient-table').closest('table').querySelector('thead tr').innerHTML = `
+    <th>Store</th>
+    <th>Ingredient</th>
+    <th style="text-align:center;">Base Qty</th>
+    <th style="text-align:center;">Buy</th>
+    <th>Pack Info</th>
+    <th>Notes</th>
+    <th></th>
+  `;
+  tbody.innerHTML = menu.ingredients.map(ing => {
+    const { rawAdj, packsToBuy, hasPackSize, fixed } = calcBuy(ing, ratio);
+    const changed = !fixed && Math.abs(rawAdj - ing.baseQty) > 0.05;
+    const flagHTML = ing.flagShort ? '<span class="tag tag-danger" style="font-size:10px;">ran short</span>' : '';
+    const nameHTML = ing.url
+      ? `<a href="${ing.url}" target="_blank" rel="noopener" style="color:#2563eb;text-decoration:none;border-bottom:1px solid #bfdbfe;" onmouseover="this.style.color='#1d4ed8'" onmouseout="this.style.color='#2563eb'">${ing.name}</a>`
+      : ing.name;
+
+    const storeLower = ing.store.toLowerCase();
+    const isCostco = storeLower.includes('costco');
+    const storeBadgeBg = isCostco ? '#eff6ff' : '#f9fafb';
+    const storeBadgeColor = isCostco ? '#1e40af' : '#6b7280';
+
+    let buyCell = '';
+    let packCell = '';
+
+    if (fixed) {
+      buyCell = `<td style="text-align:center;font-weight:600;color:#374151;">${ing.baseQty} ${ing.unit}</td>`;
+      packCell = `<td style="font-size:11px;color:#9ca3af;">fixed — not scaled</td>`;
+    } else if (hasPackSize) {
+      const color = ing.flagShort ? '#dc2626' : changed ? '#d97706' : '#111';
+      const rawDisplay = rawAdj % 1 === 0 ? rawAdj : rawAdj.toFixed(1);
+      const isExact = Math.abs((rawAdj / ing.packSize) - packsToBuy) < 0.01;
+      buyCell = `<td style="text-align:center;">
+        <span style="font-size:14px;font-weight:700;color:${color};">${packsToBuy} ${ing.packUnit}</span>
+        ${!isExact ? `<div style="font-size:10px;color:#9ca3af;">exact need: ${rawDisplay}</div>` : ''}
+      </td>`;
+      packCell = `<td style="font-size:12px;color:#6b7280;">1 ${ing.packUnit} = ${ing.packSize} ${ing.unit}</td>`;
+    } else {
+      const adjUp = Math.ceil(rawAdj);
+      buyCell = `<td style="text-align:center;font-weight:700;font-size:14px;" class="${ing.flagShort ? 'qty-bump' : changed ? 'qty-changed' : ''}">${adjUp} ${ing.unit}</td>`;
+      packCell = `<td style="font-size:12px;color:#9ca3af;">—</td>`;
+    }
+
+    return `<tr style="${fixed ? 'opacity:0.7;' : ''}">
+      <td><span style="font-size:11px;background:${storeBadgeBg};color:${storeBadgeColor};padding:2px 7px;border-radius:4px;white-space:nowrap;">${ing.store}</span></td>
+      <td>${nameHTML}</td>
+      <td style="text-align:center;color:#9ca3af;font-size:13px;">${ing.baseQty}</td>
+      ${buyCell}
+      ${packCell}
+      <td style="color:#6b7280;font-size:12px;">${ing.notes}</td>
+      <td>${flagHTML}</td>
+    </tr>`;
+  }).join('');
+}
+
+function sendToOrder() {
+  if (!selectedMenuId) return;
+  orderMenuId = selectedMenuId;
+  orderServings = currentServings;
+  showToast('Sent to Costco Order ✓');
+  setTimeout(() => showView('order'), 600);
+}
+
+function showAISuggestions() {
+  if (!selectedMenuId) return;
+  const menu = menus.find(m => m.id === selectedMenuId);
+  const ratio = currentServings / menu.baseServings;
+  const lines = menu.ingredients.map(ing => {
+    const adj = Math.ceil(ing.baseQty * ratio * 10) / 10;
+    return `- ${ing.name}: ${adj} ${ing.unit}${ing.flagShort ? ' [FLAGGED: ran short before]' : ''}`;
+  }).join('\n');
+  alert(`AI suggestions are available when connected to the Anthropic API.\n\nCurrent order for ${currentServings} servings:\n\n${lines}\n\nFlagged items may need a 15–20% buffer.`);
+}
+
+// ── Add / Edit Menu Modal ─────────────────────────────────────────────────────
+
+function openAddMenu() {
+  editingMenuId = null;
+  document.getElementById('modal-title').textContent = 'Add Menu';
+  document.getElementById('modal-name').value = '';
+  document.getElementById('modal-desc').value = '';
+  document.getElementById('modal-servings').value = '180';
+  document.getElementById('modal-ingredients').innerHTML = '';
+  addIngredientRow();
+  addIngredientRow();
+  openModal();
+}
+
+function editCurrentMenu() {
+  if (!selectedMenuId) return;
+  const menu = menus.find(m => m.id === selectedMenuId);
+  editingMenuId = menu.id;
+  document.getElementById('modal-title').textContent = 'Edit Menu';
+  document.getElementById('modal-name').value = menu.name;
+  document.getElementById('modal-desc').value = menu.desc;
+  document.getElementById('modal-servings').value = menu.baseServings;
+  document.getElementById('modal-ingredients').innerHTML = '';
+  menu.ingredients.forEach(ing => addIngredientRow(ing));
+  openModal();
+}
+
+function addIngredientRow(ing) {
+  const tbody = document.getElementById('modal-ingredients');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="padding:4px 4px;"><input type="text" value="${ing ? ing.store : 'Costco'}" placeholder="Store" style="width:100%;font-size:12px;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;" /></td>
+    <td style="padding:4px;"><input type="text" value="${ing ? ing.name : ''}" placeholder="Ingredient name" style="width:100%;font-size:12px;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;" /></td>
+    <td style="padding:4px;"><input type="number" value="${ing ? ing.baseQty : ''}" placeholder="Qty" style="width:60px;font-size:12px;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;text-align:center;" /></td>
+    <td style="padding:4px;"><input type="text" value="${ing ? ing.unit : ''}" placeholder="Unit" style="width:100%;font-size:12px;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;" /></td>
+    <td style="padding:4px;"><input type="text" value="${ing ? ing.notes : ''}" placeholder="Notes" style="width:100%;font-size:12px;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;" /></td>
+    <td style="padding:4px;text-align:center;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:16px;">×</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function saveMenu() {
+  const name = document.getElementById('modal-name').value.trim();
+  const desc = document.getElementById('modal-desc').value.trim();
+  const baseServings = parseInt(document.getElementById('modal-servings').value) || 180;
+  if (!name) { alert('Please enter a menu name.'); return; }
+
+  const rows = document.getElementById('modal-ingredients').querySelectorAll('tr');
+  const ingredients = [];
+  rows.forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    const n = inputs[1].value.trim();
+    if (!n) return;
+    ingredients.push({
+      store: inputs[0].value.trim() || 'Costco',
+      name: n,
+      baseQty: parseFloat(inputs[2].value) || 1,
+      unit: inputs[3].value.trim(),
+      notes: inputs[4].value.trim(),
+      flagShort: false
+    });
+  });
+
+  if (editingMenuId) {
+    const idx = menus.findIndex(m => m.id === editingMenuId);
+    menus[idx] = { ...menus[idx], name, desc, baseServings, ingredients };
+    // preserve difficulty
+    selectedMenuId = editingMenuId;
+  } else {
+    const id = 'menu-' + Date.now();
+    menus.push({ id, name, desc, baseServings, ingredients });
+    selectedMenuId = id;
+  }
+  save();
+  closeModal();
+  renderMenuCards();
+  selectMenu(selectedMenuId);
+  showToast('Menu saved ✓');
+}
+
+function openModal() {
+  const el = document.getElementById('modal-overlay');
+  el.style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+// ── Costco Order ──────────────────────────────────────────────────────────────
+
+function renderOrder() {
+  const menu = orderMenuId ? menus.find(m => m.id === orderMenuId) : null;
+  document.getElementById('order-menu-label').textContent = menu ? menu.name + ' · ' + orderServings + ' servings' : 'No menu selected';
+
+  const statsEl = document.getElementById('order-stats');
+  const itemsEl = document.getElementById('order-items');
+  const emptyEl = document.getElementById('order-empty');
+
+  if (!menu) {
+    statsEl.innerHTML = '';
+    itemsEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  const ratio = orderServings / menu.baseServings;
+  const totalItems = menu.ingredients.length;
+  const flagged = menu.ingredients.filter(i => i.flagShort).length;
+
+  statsEl.innerHTML = `
+    <div class="stat-card"><div class="stat-label">Menu</div><div class="stat-value" style="font-size:15px;">${menu.name}</div></div>
+    <div class="stat-card"><div class="stat-label">Servings</div><div class="stat-value">${orderServings}</div><div class="stat-sub">Base: ${menu.baseServings}</div></div>
+    <div class="stat-card"><div class="stat-label">Items to Order</div><div class="stat-value">${totalItems}</div>${flagged ? `<div class="stat-sub" style="color:#dc2626;">${flagged} flagged</div>` : ''}</div>
+  `;
+
+  itemsEl.innerHTML = menu.ingredients.map((ing, i) => {
+    const { rawAdj, packsToBuy, hasPackSize, fixed } = calcBuy(ing, ratio);
+    const nameHTML = ing.url
+      ? `<a href="${ing.url}" target="_blank" rel="noopener" style="color:#2563eb;text-decoration:none;border-bottom:1px solid #bfdbfe;">${ing.name}</a>`
+      : ing.name;
+
+    const storeLower = ing.store.toLowerCase();
+    const isCostco = storeLower.includes('costco');
+    const storeBadgeBg = isCostco ? '#eff6ff' : '#f3f4f6';
+    const storeBadgeColor = isCostco ? '#1e40af' : '#6b7280';
+
+    let qtyHTML = '';
+    if (fixed) {
+      qtyHTML = `<div style="text-align:right;">
+        <span class="order-qty">${ing.baseQty} ${ing.unit}</span>
+        <div style="font-size:11px;color:#9ca3af;">fixed — not scaled</div>
+      </div>`;
+    } else if (hasPackSize) {
+      const scaledDisplay = rawAdj % 1 === 0 ? rawAdj : rawAdj.toFixed(1);
+      qtyHTML = `<div style="text-align:right;">
+        <span class="order-qty">${packsToBuy} ${ing.packUnit || ing.unit}</span>
+        <div style="font-size:11px;color:#9ca3af;">scaled need: ${scaledDisplay} · 1 pack = ${ing.packSize} ${ing.unit}</div>
+      </div>`;
+    } else {
+      qtyHTML = `<span class="order-qty">${Math.ceil(rawAdj)} ${ing.unit}</span>`;
+    }
+
+    return `<div class="order-item" style="${fixed ? 'opacity:0.7;' : ''}">
+      <div class="order-item-left">
+        <input type="checkbox" id="chk-${i}" />
+        <label for="chk-${i}" class="order-item-name" style="cursor:pointer;">${nameHTML}${ing.flagShort ? ' <span class="tag tag-danger" style="margin-left:6px;font-size:10px;">watch stock</span>' : ''}</label>
+      </div>
+      <div class="order-item-right">
+        ${qtyHTML}
+        <span class="order-store" style="background:${storeBadgeBg};color:${storeBadgeColor};">${ing.store}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function printOrder() {
+  const menu = orderMenuId ? menus.find(m => m.id === orderMenuId) : null;
+  if (!menu) { showToast('No menu selected'); return; }
+  const ratio = orderServings / menu.baseServings;
+  _currentSheetRows = buildOrderRows(menu, ratio);
+
+  // Render sheet preview table
+  const tbody = document.getElementById('sheet-preview-body');
+  tbody.innerHTML = _currentSheetRows.map((r, i) => {
+    const bg = i % 2 === 0 ? '#fff' : '#f9fafb';
+    const linkCell = r.link
+      ? `<a href="${r.link}" target="_blank" style="color:#2563eb;font-size:11px;word-break:break-all;">${r.link.replace('https://www.costcobusinessdelivery.com/', 'costcobiz/…')}</a>`
+      : '<span style="color:#9ca3af;font-size:11px;">no link</span>';
+    const flag = r.flagShort ? ' <span style="color:#dc2626;font-size:10px;">⚠</span>' : '';
+    return `<tr style="background:${bg};border-bottom:1px solid #f3f4f6;">
+      <td style="padding:6px 10px;color:#6b7280;white-space:nowrap;">${r.meal}</td>
+      <td style="padding:6px 10px;color:#6b7280;white-space:nowrap;">${r.category}</td>
+      <td style="padding:6px 10px;font-weight:500;color:#111;white-space:nowrap;">${r.item}${flag}</td>
+      <td style="padding:6px 10px;max-width:180px;">${linkCell}</td>
+      <td style="padding:6px 10px;font-weight:700;color:#d97706;white-space:nowrap;">${r.qty}</td>
+    </tr>`;
+  }).join('');
+
+  // Build readable text for second tab
+  const divider = '─'.repeat(58);
+  const date = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  const costcoItems = _currentSheetRows.filter(r => r.isCostco);
+  const otherItems = _currentSheetRows.filter(r => !r.isCostco);
+  const costcoLines = costcoItems.map(r => {
+    const flag = r.flagShort ? ' ⚠ ran short before — order extra' : '';
+    const urlLine = r.link ? `     🔗 ${r.link}` : '     (search on site)';
+    return `[ ] ${r.item}${flag}\n     ORDER: ${r.qty}\n${urlLine}`;
+  }).join('\n\n');
+  const otherLines = otherItems.length
+    ? otherItems.map(r => `[ ] ${r.item}  —  ${r.qty}  (${r.store})`).join('\n')
+    : '(none)';
+  document.getElementById('print-text').value = [
+    `SVC FOOD OPS — THURSDAY ORDER`,
+    `Menu: ${menu.name}  |  Servings: ${orderServings}`,
+    date, '', divider,
+    `COSTCO BUSINESS (${costcoItems.length} items)`,
+    `Open each link → type qty shown → Add to Cart`,
+    divider, '', costcoLines, '',
+    divider, `OTHER STORES (${otherItems.length} items)`, divider, otherLines,
+  ].join('\n');
+
+  switchTab('sheet');
+  document.getElementById('print-overlay').style.display = 'flex';
+}
+
+function closePrint() { document.getElementById('print-overlay').style.display = 'none'; }
+
+let _currentSheetRows = [];
+let _currentTab = 'sheet';
+
+function switchTab(tab) { _currentTab = 'sheet'; }
+
+function buildOrderRows(menu, ratio) {
+  return menu.ingredients.map(ing => {
+    const { rawAdj, packsToBuy, hasPackSize, fixed } = calcBuy(ing, ratio);
+    const isCostco = ing.store.toLowerCase().includes('costco');
+    let qty = '';
+    if (fixed) {
+      qty = `${ing.baseQty} ${ing.unit}`;
+    } else if (hasPackSize) {
+      qty = `${packsToBuy} ${ing.packUnit}`;
+    } else {
+      qty = `${Math.ceil(rawAdj)} ${ing.unit}`;
+    }
+    return { meal:'SWS', category:'Other', item:ing.name, link:ing.url||'', qty, store:ing.store, isCostco, flagShort:ing.flagShort };
+  });
+}
+
+function copySheet() {
+  const tsv = _currentSheetRows.map(r => [r.meal, r.category, r.item, r.link, r.qty].join('\t')).join('\n');
+  navigator.clipboard.writeText(tsv).then(() => showToast('Copied! Paste into Google Sheet ✓')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = tsv; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Copied! Paste into Google Sheet ✓');
+  });
+}
+
+function copyForSheetFromLibrary() {
+  if (!selectedMenuId) return;
+  const menu = menus.find(m => m.id === selectedMenuId);
+  const ratio = currentServings / menu.baseServings;
+  _currentSheetRows = buildOrderRows(menu, ratio);
+
+  const tbody = document.getElementById('sheet-preview-body');
+  tbody.innerHTML = _currentSheetRows.map((r, i) => {
+    const bg = i % 2 === 0 ? '#fff' : '#f9fafb';
+    const linkCell = r.link
+      ? `<a href="${r.link}" target="_blank" style="color:#2563eb;font-size:11px;word-break:break-all;">${r.link.replace('https://www.costcobusinessdelivery.com/', 'costcobiz/…')}</a>`
+      : '<span style="color:#9ca3af;font-size:11px;">no link</span>';
+    const flag = r.flagShort ? ' <span style="color:#dc2626;font-size:10px;">⚠</span>' : '';
+    return `<tr style="background:${bg};border-bottom:1px solid #f3f4f6;">
+      <td style="padding:6px 10px;color:#6b7280;white-space:nowrap;">${r.meal}</td>
+      <td style="padding:6px 10px;color:#6b7280;white-space:nowrap;">${r.category}</td>
+      <td style="padding:6px 10px;font-weight:500;color:#111;white-space:nowrap;">${r.item}${flag}</td>
+      <td style="padding:6px 10px;max-width:180px;">${linkCell}</td>
+      <td style="padding:6px 10px;font-weight:700;color:#d97706;white-space:nowrap;">${r.qty}</td>
+    </tr>`;
+  }).join('');
+
+  const divider = '─'.repeat(58);
+  const date = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  const costcoItems = _currentSheetRows.filter(r => r.isCostco);
+  const otherItems = _currentSheetRows.filter(r => !r.isCostco);
+  const costcoLines = costcoItems.map(r => {
+    const flag = r.flagShort ? ' ⚠ ran short before — order extra' : '';
+    const urlLine = r.link ? `     🔗 ${r.link}` : '     (search on site)';
+    return `[ ] ${r.item}${flag}\n     ORDER: ${r.qty}\n${urlLine}`;
+  }).join('\n\n');
+  const otherLines = otherItems.length
+    ? otherItems.map(r => `[ ] ${r.item}  —  ${r.qty}  (${r.store})`).join('\n') : '(none)';
+  document.getElementById('print-text').value = [
+    `SVC FOOD OPS — THURSDAY ORDER`,
+    `Menu: ${menu.name}  |  Servings: ${currentServings}`,
+    date, '', divider,
+    `COSTCO BUSINESS (${costcoItems.length} items)`,
+    `Open each link → type qty shown → Add to Cart`,
+    divider, '', costcoLines, '',
+    divider, `OTHER STORES (${otherItems.length} items)`, divider, otherLines,
+  ].join('\n');
+
+  switchTab('sheet');
+  document.getElementById('print-overlay').style.display = 'flex';
+}
+
+function copyOrder() { copySheet(); }
+
+// ── Feedback ──────────────────────────────────────────────────────────────────
+
+function populateFeedbackMenuSelect() {
+  const sel = document.getElementById('fb-menu');
+  sel.innerHTML = '<option value="">Select menu...</option>' + menus.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+}
+
+function saveFeedback() {
+  const date = document.getElementById('fb-date').value;
+  const menuId = document.getElementById('fb-menu').value;
+  const attendance = document.getElementById('fb-attendance').value;
+  const rating = document.getElementById('fb-rating').value;
+  const notes = document.getElementById('fb-notes').value.trim();
+  if (!date || !menuId) { showToast('Please fill in date and menu.'); return; }
+
+  feedbackLog.unshift({ id: Date.now(), date, menuId, attendance, rating, notes });
+
+  // Auto-flag ingredients mentioned as short
+  if (notes.toLowerCase().includes('ran out') || notes.toLowerCase().includes('ran short') || notes.toLowerCase().includes('not enough')) {
+    const menu = menus.find(m => m.id === menuId);
+    if (menu) {
+      menu.ingredients.forEach(ing => {
+        if (notes.toLowerCase().includes(ing.name.toLowerCase())) ing.flagShort = true;
+      });
+    }
+  }
+
+  save();
+  document.getElementById('fb-notes').value = '';
+  document.getElementById('fb-attendance').value = '';
+  document.getElementById('fb-rating').value = '';
+  renderFeedbackLog();
+  renderMenuCards();
+  showToast('Feedback saved ✓');
+}
+
+function renderFeedbackLog() {
+  const c = document.getElementById('feedback-log');
+  if (!feedbackLog.length) {
+    c.innerHTML = '<p style="font-size:13px;color:#9ca3af;">No feedback logged yet.</p>';
+    return;
+  }
+  const ratingColor = { great:'#059669', perfect:'#2563eb', tight:'#d97706', short:'#dc2626' };
+  const ratingLabel = { great:'Great', perfect:'Perfect', tight:'Tight', short:'Ran short' };
+  c.innerHTML = feedbackLog.map(fb => {
+    const menuName = menus.find(m => m.id === fb.menuId)?.name || fb.menuId;
+    const col = ratingColor[fb.rating] || '#6b7280';
+    return `<div class="feedback-item">
+      <div class="feedback-item-header">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="feedback-menu-name">${menuName}</span>
+          ${fb.rating ? `<span class="tag" style="background:${col}22;color:${col};">${ratingLabel[fb.rating]||fb.rating}</span>` : ''}
+        </div>
+        <div class="feedback-meta">
+          ${fb.attendance ? fb.attendance + ' attended · ' : ''}${fb.date}
+        </div>
+      </div>
+      ${fb.notes ? `<div class="feedback-notes">${fb.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function aiFromFeedback() {
+  const notes = document.getElementById('fb-notes').value;
+  const menuId = document.getElementById('fb-menu').value;
+  const menu = menus.find(m => m.id === menuId);
+  if (!menu) { showToast('Select a menu first'); return; }
+  alert(`Connect this to the Anthropic API to get AI suggestions based on:\n\nMenu: ${menu.name}\nFeedback: "${notes || '(no notes entered yet)'}"\n\nThe AI will suggest specific % adjustments per ingredient.`);
+}
+
+// ── Schedule ──────────────────────────────────────────────────────────────────
+
+function renderSchedule() {
+  const c = document.getElementById('schedule-grid');
+  c.innerHTML = scheduleData.map((s, i) => {
+    const d = new Date(s.date + 'T12:00:00');
+    const label = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+    const menu = s.menuId ? menus.find(m => m.id === s.menuId) : null;
+    return `<div class="schedule-item">
+      <div>
+        <div class="schedule-date">${label}</div>
+        <div class="schedule-menu">${menu ? menu.name : 'No menu assigned'}</div>
+      </div>
+      <div class="schedule-controls">
+        <select onchange="assignScheduleMenu(${i}, this.value)" style="font-size:12px;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;">
+          <option value="">Assign menu...</option>
+          ${menus.map(m => `<option value="${m.id}" ${s.menuId === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
+        </select>
+        ${menu ? `<button class="btn btn-primary btn-sm" onclick="viewScheduleMenu('${s.menuId}')">View</button>` : ''}
+        <button class="btn btn-secondary btn-sm" onclick="removeScheduleWeek(${i})">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function assignScheduleMenu(idx, menuId) {
+  scheduleData[idx].menuId = menuId || null;
+  save();
+  renderSchedule();
+}
+
+function viewScheduleMenu(id) {
+  selectedMenuId = id;
+  showView('menus');
+  selectMenu(id);
+}
+
+function addScheduleWeek() {
+  const last = scheduleData[scheduleData.length - 1];
+  const d = last ? new Date(last.date + 'T12:00:00') : new Date();
+  d.setDate(d.getDate() + 7);
+  scheduleData.push({ date: d.toISOString().slice(0,10), menuId: null });
+  save();
+  renderSchedule();
+}
+
+function removeScheduleWeek(idx) {
+  scheduleData.splice(idx, 1);
+  save();
+  renderSchedule();
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function showHowItWorks() {
+  alert(
+    'SVC Food Ops — How It Works\n\n' +
+    '1. MENU LIBRARY — Pre-load menus with ingredients at a base serving size (e.g. 180). Change the serving number and quantities adjust automatically. Red items ran short before.\n\n' +
+    '2. COSTCO ORDER — After adjusting servings, click "Send to Costco Order". Use the checklist on Thursday when ordering. Copy the formatted list to send via text/email.\n\n' +
+    '3. SERVICE FEEDBACK — After each Sunday, log attendance, rating, and notes. If you mention an ingredient "ran out" or "ran short", it gets flagged automatically in the menu.\n\n' +
+    '4. MONTHLY SCHEDULE — Assign menus to upcoming Sundays so you can plan ahead.\n\n' +
+    'All data is saved in your browser automatically.'
+  );
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderMenuCards();
+</script>
+</body>
+</html>
