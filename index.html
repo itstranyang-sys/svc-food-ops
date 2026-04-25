@@ -476,15 +476,15 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
     prepInstructions: `HOT DOGS\n- Put hot dogs into 4 rice cookers and oven roasters with some water and cook\n- Set aside toppings (shredded cheese, diced onions) into trays\n\nSALAD\n- Grab 5 clear trays\n- Cut English cucumbers (half moon)\n- Cut cherry tomatoes (long way)\n- Set up Spring Mix in trays\n\nA2K\n- Cook Aidells Chicken Sausage in the small 10-cup rice pot`,
     ingredients: [
       { store:'Costco', name:'Stagg Premium Country Brand Chili', baseQty:6, unit:'cans', notes:'Heat in rice cooker', flagShort:false, url:'https://www.costcobusinessdelivery.com/stagg-premium-country-brand-chili-with-beans,-%2310-can,-6-lbs-12-oz%C2%A0.product.10178549.html' },
-      { store:'Costco', name:'Shredded Cheese', baseQty:2, unit:'5lb bags', notes:'Optional topping', flagShort:false },
-      { store:'Costco', name:'Chips', baseQty:3, unit:'50ct boxes', notes:'', flagShort:false },
+      { store:'Costco', name:'Shredded Cheese', baseQty:2, unit:'5lb bags', notes:'Optional topping', flagShort:false, url:'https://www.costcobusinessdelivery.com/cheswick-sharp-cheddar-cheese,-shredded,-5-lbs.product.11954589.html' },
+      { store:'Costco', name:'Chips', baseQty:3, unit:'50ct boxes', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/frito-lay-classic-mix,-variety-pack,-1-oz,-54-ct.product.100449567.html' },
       { store:'Costco', name:'Hot Dogs (Kirkland Dinner Franks)', baseQty:15, unit:'packs', packSize:14, packUnit:'pack (14 links)', notes:'Put in 4 rice cookers', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-beef-dinner-franks,-costcos-14-lb-plus,-14-links,-3.81-lbs.product.11467741.html' },
       { store:'Costco', name:'Hot Dog Buns (Franz Classic)', baseQty:9, unit:'bags', packSize:24, packUnit:'bag (24 buns)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/franz-hot-dog-buns,-classic,-24-ct.product.100238062.html' },
-      { store:'Costco', name:'Diced Onions', baseQty:1, unit:'tubs', notes:'Dice smaller', flagShort:false },
+      { store:'Costco', name:'Diced Onions', baseQty:1, unit:'tubs', notes:'Dice smaller', flagShort:false, url:'https://www.costcobusinessdelivery.com/s?keyword=diced+onions' },
       { store:'Costco', name:'Spring Mix', baseQty:5, unit:'boxes (3lb)', notes:'Salad — watch stock', flagShort:true, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
       { store:'Costco', name:'English Cucumbers', baseQty:2, unit:'3-packs', notes:'Cut half moon', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
       { store:'Costco', name:'Grape Tomatoes', baseQty:2, unit:'boxes (2lb)', notes:'Cut long way', flagShort:false, url:'https://www.costcobusinessdelivery.com/grape-tomatoes,-clamshell,-2-lbs.product.10181893.html' },
-      { store:'Costco', name:'Aidells Smoked Chicken Sausage', baseQty:1, unit:'packs', notes:'For A2K group (small rice cooker)', flagShort:false },
+      { store:'Costco', name:'Aidells Smoked Chicken Sausage', baseQty:1, unit:'packs', notes:'For A2K group (small rice cooker)', flagShort:false, url:'https://www.costcobusinessdelivery.com/aidells-smoked-chicken-sausage,-chicken-&-apple,-3-lbs.product.11148508.html' },
     ]
   },
   {
@@ -497,13 +497,13 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco', name:'Black Beans (Goya, 8ct)', baseQty:5, unit:'cases', packSize:8, packUnit:'case (8 cans, 15.5oz each)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/goya-black-beans,-15.5-oz-can,-8-ct.product.100275469.html' },
       { store:'Costco', name:'Shredded Cooked Chicken (46oz pack)', baseQty:10, unit:'packs', notes:'72 cups total', flagShort:false, url:'https://www.costcobusinessdelivery.com/rotisserie-chicken-breast-meat,-46-oz.product.11975863.html' },
       { store:'Costco', name:'Canned Corn (Del Monte, 12ct)', baseQty:2, unit:'cases', packSize:12, packUnit:'case (12 cans, 15.25oz each)', notes:'54 cups corn', flagShort:false, url:'https://www.costco.com/p/-/del-monte-canned-corn-whole-kernel-1525-oz-12-count/100443694' },
-      { store:'Costco', name:'Lime Juice', baseQty:1, unit:'bottle', notes:'2.25 cups (36 Tbsp)', flagShort:false },
-      { store:'Costco', name:'Cilantro Leaves', baseQty:1, unit:'lb', notes:'12 cups chopped', flagShort:false },
+      { store:'Costco', name:'Lime Juice', baseQty:1, unit:'bottle', notes:'2.25 cups (36 Tbsp)', flagShort:false, url:'https://www.costcobusinessdelivery.com/del-destino-100%25-lime-juice,-128-fl-oz.product.100317691.html' },
+      { store:'Costco', name:'Cilantro Leaves', baseQty:1, unit:'lb', notes:'12 cups chopped', flagShort:false, url:'https://www.costcobusinessdelivery.com/cilantro,-1-lb.product.11753602.html' },
       { store:'Walsh', name:'Tomato Chicken Bouillon', baseQty:1, unit:'to taste', notes:'Check Walsh', flagShort:false },
       { store:'Costco', name:'Sour Cream (32lb tub)', baseQty:1, unit:'tubs', notes:'Optional for serving', flagShort:false, url:'https://www.costcobusinessdelivery.com/p/-/sour-cream-original-32-lbs/11023573' },
       { store:'Costco', name:'Shredded Cheese (Cheswick, 5lb)', baseQty:1, unit:'bags', notes:'Optional for serving', flagShort:false, url:'https://www.costcobusinessdelivery.com/cheswick-sharp-cheddar-cheese,-shredded,-5-lbs.product.11954589.html' },
       { store:'Costco', name:'Tortilla Chips (Kirkland, 40oz)', baseQty:1, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-organic-tortilla-chips,-40-oz.product.11987050.html' },
-      { store:'Costco', name:'Salsa', baseQty:1, unit:'jars', notes:'', flagShort:false },
+      { store:'Costco', name:'Salsa', baseQty:1, unit:'jars', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-organic-salsa,-medium,-38-oz,-2-ct.product.100407935.html' },
     ]
   },
   {
@@ -511,10 +511,10 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
     baseServings: 130, catered: false, difficulty: 'easy',
     prepInstructions: `SOUP PREP\n- Bring out 3 rice pots + 2 roasters (6 things total)\n- Into each rice cooker pour:\n  · Potatoes (1 lab)\n  · 2 lbs of chicken\n  · Frozen vegetables (0.5 lb)\n  · Chicken broth (2 cartons)\n  · Cream of chicken (2-3 cans)\n  · Add water to the 30-cup line\n  · Cook and stir occasionally; add salt and pepper to taste\n- Into each roaster pour same as above\n\nBREAD\n- Set out Hawaiian rolls in trays\n\nSALAD\n- Cut cucumbers, cut tomatoes\n- Set out spring mix, cucumbers, and tomatoes in trays\n- Dress the salad before serving\n\nNOTE: Had ~2 packs of potatoes and 1.5 bags of frozen veggies leftover last time. About 95 people attended vs 130 estimated.`,
     ingredients: [
-      { store:'Costco', name:'Pre-shredded Chicken', baseQty:10, unit:'count', notes:'', flagShort:false },
+      { store:'Costco', name:'Pre-shredded Chicken', baseQty:10, unit:'count', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/rotisserie-chicken-breast-meat,-46-oz.product.11975863.html' },
       { store:'Costco', name:'Chicken Broth (Swanson)', baseQty:12, unit:'cans', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/swanson-natural-goodness-chicken-broth,-less-sodium,-14.5-oz,-12-ct.product.100122115.html' },
-      { store:'Costco', name:'Pre-cut Potatoes', baseQty:5, unit:'count (25lbs)', notes:'', flagShort:false },
-      { store:'Costco', name:'Bag Frozen Mixed Vegetables', baseQty:4, unit:'count (15 lbs)', notes:'', flagShort:false },
+      { store:'Costco', name:'Pre-cut Potatoes', baseQty:5, unit:'count (25lbs)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/flav-r-pac-diced-red-potatoes,-5-lbs.product.11664495.html' },
+      { store:'Costco', name:'Bag Frozen Mixed Vegetables', baseQty:4, unit:'count (15 lbs)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-organic-mixed-vegetables,-5-lbs.product.100351236.html' },
       { store:'Safeway', name:'Cream of Chicken', baseQty:12, unit:'cans', notes:'', flagShort:false },
       { store:'Costco', name:'Hawaiian Sweet Rolls', baseQty:10, unit:'count', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/p/-/kirkland-signature-sweet-hawaiian-rolls-36-count/100441835' },
       { store:'Walsh', name:'Garlic Salt or Salt to taste', baseQty:1, unit:'to taste', notes:'Check Walsh', flagShort:false },
@@ -532,16 +532,16 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Ranch 99', name:'Japanese Mayo', baseQty:3, unit:'bottles', notes:'', flagShort:false },
       { store:'Ranch 99', name:'Okayamami Sauce', baseQty:3, unit:'bottles', notes:'', flagShort:false },
       { store:'Ranch 99', name:'Bonito Flakes (katsuobushi)', baseQty:6, unit:'bags', notes:'', flagShort:false },
-      { store:'Costco', name:'Furikake', baseQty:4, unit:'jars', notes:'', flagShort:false },
+      { store:'Costco', name:'Furikake', baseQty:4, unit:'jars', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/olde-thompson-furikake-rice-seasoning,-22.9-oz.product.2001172406.html' },
       { store:'Costco', name:'Hot Dogs (Kirkland Dinner Franks)', baseQty:13, unit:'packs', packSize:14, packUnit:'pack (14 links)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-beef-dinner-franks,-costcos-14-lb-plus,-14-links,-3.81-lbs.product.11467741.html' },
       { store:'Costco', name:'Hot Dog Buns (Franz Classic)', baseQty:12, unit:'bags', packSize:24, packUnit:'bag (24 buns)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/franz-hot-dog-buns,-classic,-24-ct.product.100238062.html' },
-      { store:'Costco', name:'Aidells Smoked Chicken Sausage', baseQty:1, unit:'packs (15ct)', notes:'For A2K; cook in small rice cooker', flagShort:false },
+      { store:'Costco', name:'Aidells Smoked Chicken Sausage', baseQty:1, unit:'packs (15ct)', notes:'For A2K; cook in small rice cooker', flagShort:false, url:'https://www.costcobusinessdelivery.com/aidells-smoked-chicken-sausage,-chicken-&-apple,-3-lbs.product.11148508.html' },
       { store:'Costco', name:'Spring Mix', baseQty:5, unit:'boxes (3lb)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
       { store:'Costco', name:'English Cucumbers', baseQty:2, unit:'3-packs', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
       { store:'Costco', name:'Grape Tomatoes', baseQty:2, unit:'boxes (2lb)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/grape-tomatoes,-clamshell,-2-lbs.product.10181893.html' },
       { store:'Costco or Ranch 99', name:'Asian Sesame Dressing', baseQty:3, unit:'bottles', notes:'', flagShort:false },
       { store:'Samart or Final', name:'Frozen Shelled Edamame', baseQty:5, unit:'bags', notes:'Optional', flagShort:false },
-      { store:'Costco', name:'Chips', baseQty:3, unit:'boxes (50ct)', notes:'', flagShort:false },
+      { store:'Costco', name:'Chips', baseQty:3, unit:'boxes (50ct)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/frito-lay-classic-mix,-variety-pack,-1-oz,-54-ct.product.100449567.html' },
     ]
   },
   {
@@ -549,17 +549,17 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
     baseServings: 180, catered: false, difficulty: 'easy',
     prepInstructions: `PIZZA\n- Order pizza from Costco (call ahead)\n- Pick up pizza day of\n\nSALAD (Caesar)\n- Grab 5 clear trays and line\n- Wash lettuce\n- Mix lettuce and spring mix\n- Add parmesan cheese\n- Add croutons (day of so they don't get soggy)\n- Add bacon bits\n- Caesar dressing on the side\n- Check Walsh freezer for leftover parmesan and croutons\n\nFRUIT\n- Arrange cara cara oranges, strawberries, blueberries, watermelon in trays`,
     ingredients: [
-      { store:'Costco', name:'Cheese Pizza', baseQty:17, unit:'boxes', notes:'', flagShort:false },
-      { store:'Costco', name:'Pepperoni Pizza', baseQty:17, unit:'boxes', notes:'', flagShort:false },
-      { store:'Costco', name:'Parmesan Cheese', baseQty:2, unit:'pack', notes:'Check Walsh freezer for leftovers', flagShort:false },
-      { store:'Costco', name:'Croutons', baseQty:2, unit:'boxes', notes:'Check Walsh for leftovers', flagShort:false },
-      { store:'Costco', name:'Caesar Dressing', baseQty:1, unit:'count (6pc)', notes:'', flagShort:false },
-      { store:'Costco', name:'Bacon Bits', baseQty:3, unit:'count', notes:'Optional', flagShort:false },
+      { store:'Costco', name:'Cheese Pizza', baseQty:17, unit:'boxes', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-cheese-pizza,-18.25-oz,-4-ct.product.2001143791.html' },
+      { store:'Costco', name:'Pepperoni Pizza', baseQty:17, unit:'boxes', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-pepperoni-pizza,-thin-crust,-4-ct.product.100264489.html' },
+      { store:'Costco', name:'Parmesan Cheese', baseQty:2, unit:'pack', notes:'Check Walsh freezer for leftovers', flagShort:false, url:'https://www.costcobusinessdelivery.com/belgioioso-aged-parmesan-cheese,-shredded,-5-lbs.product.100366194.html' },
+      { store:'Costco', name:'Croutons', baseQty:2, unit:'boxes', notes:'Check Walsh for leftovers', flagShort:false, url:'https://www.costcobusinessdelivery.com/fresh-gourmet-seasoned-organic-croutons,-2-lbs.product.100146053.html' },
+      { store:'Costco', name:'Caesar Dressing', baseQty:1, unit:'count (6pc)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kens-caesar-dressing,-1-gallon.product.100392052.html' },
+      { store:'Costco', name:'Bacon Bits', baseQty:3, unit:'count', notes:'Optional', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-crumbled-bacon-bits,-1.25-lbs.product.11302316.html' },
       { store:'Costco', name:'Spring Mix (3lb bag)', baseQty:5, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
-      { store:'Costco', name:'Cara Cara Oranges', baseQty:1, unit:'bag', notes:'', flagShort:false },
-      { store:'Costco', name:'Strawberries', baseQty:2, unit:'count', notes:'', flagShort:false },
-      { store:'Costco', name:'Blueberries', baseQty:4, unit:'ct', notes:'', flagShort:false },
-      { store:'Costco', name:'Watermelon', baseQty:2, unit:'ct', notes:'', flagShort:false },
+      { store:'Costco', name:'Cara Cara Oranges', baseQty:1, unit:'bag', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/cara-cara-oranges,-5-lbs.product.100077591.html' },
+      { store:'Costco', name:'Strawberries', baseQty:2, unit:'count', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/premium-strawberries,-2-lbs.product.11576937.html' },
+      { store:'Costco', name:'Blueberries', baseQty:4, unit:'ct', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/premium-blueberries,-18-oz.product.11906534.html' },
+      { store:'Costco', name:'Watermelon', baseQty:2, unit:'ct', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/jumbo-seedless-watermelon.product.10178422.html' },
     ]
   },
   {
@@ -570,7 +570,7 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
     ingredients: [
       { store:'Nob Hill (catering)', name:'Fried & Roast Chicken Legs/Thighs', baseQty:8, unit:'trays (48 pcs/tray)', notes:'6 fried, 3 roasted. Call ahead. ~$622', flagShort:false },
       { store:'Costco', name:'Spring Mix (3lb bag)', baseQty:6, unit:'bags', notes:'', flagShort:true, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
-      { store:'Costco', name:'Strawberries', baseQty:5, unit:'boxes', notes:'', flagShort:false },
+      { store:'Costco', name:'Strawberries', baseQty:5, unit:'boxes', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/premium-strawberries,-2-lbs.product.11576937.html' },
       { store:'Costco', name:'English Cucumbers (3-pack)', baseQty:3, unit:'packs', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
       { store:'S&F', name:'Jalapeños', baseQty:30, unit:'count', notes:'For Peruvian sauce (optional)', flagShort:false },
       { store:'S&F', name:'Cilantro', baseQty:5, unit:'bundles', notes:'Peruvian + Chimichurri sauce', flagShort:false },
@@ -583,7 +583,7 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'S&F', name:'Lemon Juice', baseQty:1, unit:'3/4 cup', notes:'', flagShort:false },
       { store:'S&F / Walsh', name:'Olive Oil (Chimichurri)', baseQty:1, unit:'4.5 cups', notes:'', flagShort:false },
       { store:'S&F', name:'Parsley', baseQty:1, unit:'bundle', notes:'', flagShort:false },
-      { store:'Costco', name:'Rice', baseQty:1, unit:'bag', notes:'25 cups in 3 cookers + 10 cups A2K', flagShort:false },
+      { store:'Costco', name:'Rice', baseQty:1, unit:'bag', notes:'25 cups in 3 cookers + 10 cups A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-thai-hom-mali-jasmine-rice,-long-grain,-50-lbs.product.11956061.html' },
     ]
   },
   {
@@ -596,10 +596,10 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco', name:'English Cucumbers (3-pack)', baseQty:2, unit:'packs', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/organic-long-english-cucumber,-3-ct.product.100278652.html' },
       { store:'Costco', name:'Hoagie Rolls (Francisco, 12ct)', baseQty:10, unit:'bags', packSize:12, packUnit:'bag (12 rolls)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/francisco-gourmet-sesame-seed-hoagie-rolls,-12-ct.product.11091691.html' },
       { store:'Costco', name:'Meatballs (Kirkland, 6lb ~140ct)', baseQty:10, unit:'bags', notes:'Check Walsh; ~2 bags per rice cooker', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-meatballs,-italian-style-beef,-6-lbs.product.10182018.html' },
-      { store:'Costco', name:'Mozzarella Cheese', baseQty:2, unit:'bags', notes:'Defrost before Sunday', flagShort:false },
+      { store:'Costco', name:'Mozzarella Cheese', baseQty:2, unit:'bags', notes:'Defrost before Sunday', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-mozzarella-cheese,-shredded,-2.5-lbs,-2-ct.product.100316460.html' },
       { store:'Costco', name:'Prego Pasta Sauce (3-pack, 45oz each)', baseQty:4, unit:'3-packs', notes:'Check Walsh freezer; ~1.5 bottles per cooker', flagShort:false, url:'https://www.costcobusinessdelivery.com/prego-pasta-sauce,-traditional-lower-sodium,-45-oz,-3-ct.product.100373058.html' },
       { store:'Smart and Final', name:'Penne Pasta', baseQty:5, unit:'boxes', notes:'For A2K food', flagShort:false },
-      { store:'Costco', name:'Potato Chips', baseQty:4, unit:'bags', notes:'', flagShort:false },
+      { store:'Costco', name:'Potato Chips', baseQty:4, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/ruffles-potato-chips,-original,-28-oz.product.11905216.html' },
     ]
   },
   {
@@ -610,8 +610,8 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco', name:'Meatballs (Kirkland, 6lb ~140ct)', baseQty:10, unit:'bags', notes:'About 180 ppl; store in fridge', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-meatballs,-italian-style-beef,-6-lbs.product.10182018.html' },
       { store:'Costco', name:'Spring Mix (3lb bag)', baseQty:5, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
       { store:'Costco', name:'Mr. Yoshida\'s Sauce (86oz bottle)', baseQty:3, unit:'bottles', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/mr.-yoshidas-marinade-&-cooking-sauce,-original-gourmet,-86-oz.product.2001178720.html' },
-      { store:'Costco', name:'Rice', baseQty:1, unit:'bag', notes:'80 cups service + 10 cups A2K', flagShort:false },
-      { store:'Costco', name:'Aidells Smoked Chicken Sausage', baseQty:1, unit:'pack', notes:'For A2K', flagShort:false },
+      { store:'Costco', name:'Rice', baseQty:1, unit:'bag', notes:'80 cups service + 10 cups A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-thai-hom-mali-jasmine-rice,-long-grain,-50-lbs.product.11956061.html' },
+      { store:'Costco', name:'Aidells Smoked Chicken Sausage', baseQty:1, unit:'pack', notes:'For A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/aidells-smoked-chicken-sausage,-chicken-&-apple,-3-lbs.product.11148508.html' },
     ]
   },
   {
@@ -635,7 +635,7 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco Business', name:'Tomatoes', baseQty:1, unit:'count (4 lbs)', notes:'', flagShort:false },
       { store:'Costco Business', name:'Lime', baseQty:1, unit:'bag', notes:'', flagShort:false },
       { store:'Costco Business', name:'Cilantro', baseQty:2, unit:'lbs', notes:'', flagShort:false },
-      { store:'Costco', name:'Rice', baseQty:1, unit:'bag', notes:'75 cups + 7 cups A2K', flagShort:false },
+      { store:'Costco', name:'Rice', baseQty:1, unit:'bag', notes:'75 cups + 7 cups A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-thai-hom-mali-jasmine-rice,-long-grain,-50-lbs.product.11956061.html' },
     ]
   },
   {
@@ -643,12 +643,12 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
     baseServings: 150, catered: false, difficulty: 'easy',
     prepInstructions: `PREP WORK (night before)\n- Defrost meatballs if needed\n\nMAKE RICE\n- Make 12 cups of rice\n- Line stacker coolers\n\nCOOK PORK\n- Microwave pork\n- Heat in the skillet\n\nCOLESLAW (at the end)\n- Set coleslaw in trays\n- Drizzle dressing towards the end of food prep\n\nBREAD\n- Line stacker coolers\n- Place hot dog buns in coolers → burger buns in tray\n\nA2K\n- Get 2-3 1/2 Al trays\n- Carve up the chicken\n- Heat up in oven @ 325 uncovered for 20-30 min\n- Cover until 10:30\n- Put 1/2 trays in metal trays and put in warmer\n\nYOSHIDA SAUCE\n- Make sauce (leftover from Walsh)\n\nMISC\n- Set up runner tables for outside with tape\n- Waters\n- Utensil baskets\n- Serving things in plastic bin\n\nNOTE: Food estimate was good. Had rice leftover for A2K.`,
     ingredients: [
-      { store:'Costco', name:'Pulled Pork', baseQty:18, unit:'boxes', notes:'', flagShort:false },
-      { store:'Costco', name:'BBQ Sauce', baseQty:2, unit:'packs (2 bottles)', notes:'Check Walsh before buying', flagShort:false },
+      { store:'Costco', name:'Pulled Pork', baseQty:18, unit:'boxes', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-smoked-pulled-pork,-rubbed-with-seasonings,-32-oz.product.2001139710.html' },
+      { store:'Costco', name:'BBQ Sauce', baseQty:2, unit:'packs (2 bottles)', notes:'Check Walsh before buying', flagShort:false, url:'https://www.costcobusinessdelivery.com/Sweet-Baby-Rays-Barbecue-Sauce,-160-oz.product.11765667.html' },
       { store:'Costco', name:'Hoagie Rolls (Francisco, 12ct)', baseQty:10, unit:'bags', packSize:12, packUnit:'bag (12 rolls)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/francisco-gourmet-sesame-seed-hoagie-rolls,-12-ct.product.11091691.html' },
       { store:'Smart and Final', name:'Coleslaw Salad', baseQty:3, unit:'bags (5lb)', notes:'', flagShort:false },
       { store:'Smart and Final', name:'Coleslaw Dressing', baseQty:2, unit:'bottles (3.78L)', notes:'', flagShort:false },
-      { store:'Costco', name:'Kettle Chips', baseQty:4, unit:'bags', notes:'', flagShort:false },
+      { store:'Costco', name:'Kettle Chips', baseQty:4, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-krinkle-cut-kettle-chips,-himalayan-salt,-32-oz.product.100345834.html' },
       { store:'Costco', name:'Rotisserie Chicken', baseQty:5, unit:'chickens', notes:'For A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/rotisserie-chicken,-8-ct.product.100455326.html' },
       { store:'Walsh', name:'Yoshida Sauce', baseQty:1, unit:'leftover', notes:'Have leftover Yoshida at Walsh', flagShort:false },
       { store:'Smart and Final', name:'Green Onion', baseQty:1, unit:'bunch', notes:'', flagShort:false },
@@ -669,7 +669,7 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco', name:'Chicken Thighs (boneless/skinless)', baseQty:8, unit:'lbs', packSize:6, packUnit:'6lb bag', notes:'For A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-chicken-tenderloins,-boneless-skinless,-6-lbs.product.100367403.html' },
       { store:'Walsh', name:'Flour', baseQty:1, unit:'bag', notes:'For A2K chicken coating', flagShort:false },
       { store:'Walsh', name:'Rice', baseQty:8, unit:'cups', notes:'For A2K', flagShort:false },
-      { store:'Costco', name:'Broccoli', baseQty:2, unit:'bags', notes:'For A2K', flagShort:false },
+      { store:'Costco', name:'Broccoli', baseQty:2, unit:'bags', notes:'For A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/broccoli-florets,-3-lbs.product.10178483.html' },
     ]
   },
   {
@@ -680,9 +680,9 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
     ingredients: [
       { store:'Popeyes (catering)', name:'Chicken Sandwiches', baseQty:100, unit:'count (50 spicy, 50 classic)', notes:'Order via ezcater.com/catering. ~$902', flagShort:false },
       { store:'Costco', name:'Spinach', baseQty:5, unit:'boxes (1lb)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/revol-greens-organic-spring-mix,-1-lb.product.100406636.html' },
-      { store:'Costco', name:'Romaine Lettuce', baseQty:3, unit:'bags (6ct)', notes:'', flagShort:false },
-      { store:'Costco', name:'Shredded Parmigiano', baseQty:2, unit:'boxes', notes:'', flagShort:false },
-      { store:'Costco', name:'Croutons', baseQty:2, unit:'bags', notes:'Add day-of so they stay crunchy', flagShort:false },
+      { store:'Costco', name:'Romaine Lettuce', baseQty:3, unit:'bags (6ct)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/romaine-lettuce-hearts,-6-ct.product.10181240.html' },
+      { store:'Costco', name:'Shredded Parmigiano', baseQty:2, unit:'boxes', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-aged-parmigiano-reggiano-cheese,-shredded,-1-lb.product.11906214.html' },
+      { store:'Costco', name:'Croutons', baseQty:2, unit:'bags', notes:'Add day-of so they stay crunchy', flagShort:false, url:'https://www.costcobusinessdelivery.com/fresh-gourmet-seasoned-organic-croutons,-2-lbs.product.100146053.html' },
       { store:'Smart & Final', name:'Caesar Dressing', baseQty:3, unit:'bottles', notes:'', flagShort:false },
     ]
   },
