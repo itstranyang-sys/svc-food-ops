@@ -569,7 +569,7 @@
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 // Version bump — clears old cached menus so new full list loads
-const DATA_VERSION = '14';
+const DATA_VERSION = '15';
 if (localStorage.getItem('svc_data_version') !== DATA_VERSION) {
   localStorage.removeItem('svc_menus');
   localStorage.setItem('svc_data_version', DATA_VERSION);
@@ -1414,6 +1414,7 @@ function addIngredientRow(ing) {
     <td style="padding:4px;"><input type="number" value="${ing ? ing.baseQty : ''}" placeholder="Qty" style="width:60px;font-size:12px;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;text-align:center;" /></td>
     <td style="padding:4px;"><input type="text" value="${ing ? ing.unit : ''}" placeholder="Unit" style="width:100%;font-size:12px;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;" /></td>
     <td style="padding:4px;"><input type="text" value="${ing ? ing.notes : ''}" placeholder="Notes" style="width:100%;font-size:12px;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;" /></td>
+    <td style="display:none;"><input type="hidden" value="${ing ? (ing.url || '') : ''}" /></td>
     <td style="padding:4px;text-align:center;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:16px;">×</button></td>
   `;
   tbody.appendChild(tr);
@@ -1437,6 +1438,7 @@ function saveMenu() {
       baseQty: parseFloat(inputs[2].value) || 1,
       unit: inputs[3].value.trim(),
       notes: inputs[4].value.trim(),
+      url: inputs[5] ? inputs[5].value.trim() : '',
       flagShort: false
     });
   });
