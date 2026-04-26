@@ -196,6 +196,10 @@
       <span class="nav-icon">📅</span>
       <span class="nav-label">Monthly Schedule</span>
     </div>
+    <div class="nav-item" id="nav-timeline" onclick="showView('timeline')">
+      <span class="nav-icon">⏱</span>
+      <span class="nav-label">Detailed Timeline</span>
+    </div>
     <div class="sidebar-bottom">
       <div class="sidebar-section">
         <p class="sidebar-section-label">Info</p>
@@ -275,7 +279,7 @@
             </table>
           </div>
           <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-primary btn-sm" onclick="sendToOrder()">Send to Costco Order</button>
+            <button class="btn btn-primary btn-sm" onclick="sendToOrder()">Open Inventory Sheet</button>
             <button class="btn btn-secondary btn-sm" onclick="editCurrentMenu()">Edit Menu</button>
             <button class="btn btn-secondary btn-sm" onclick="copyForSheetFromLibrary()">📋 Copy for Sheet</button>
           </div>
@@ -357,6 +361,91 @@
     </div>
 
     <!-- MONTHLY SCHEDULE -->
+    <!-- DETAILED TIMELINE -->
+    <div id="view-timeline" class="view">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Detailed Timeline</div>
+          <div class="view-subtitle">Day-of task list for the food lead and team, assigned by person.</div>
+        </div>
+      </div>
+
+      <!-- Setup panel -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-body">
+          <div class="form-row" style="align-items:flex-end;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Menu</label>
+              <select id="tl-menu-select" class="form-select" onchange="tlResetOutput()">
+                <option value="">— Select a menu —</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Team members <span style="color:#dc2626;">*</span> <span style="font-weight:400;color:#9ca3af;">(comma-separated)</span></label>
+              <input type="text" id="tl-names" class="form-input" placeholder="e.g. Sam, Jordan, Alex, Taylor" oninput="tlResetOutput()" />
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+            <button class="btn btn-primary" onclick="generateTimeline()">Generate Timeline</button>
+            <span id="tl-error" style="font-size:12px;color:#dc2626;display:none;"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div id="tl-output" style="display:none;">
+
+        <!-- 9:45–10:00 block -->
+        <div style="display:flex;gap:14px;margin-bottom:12px;align-items:flex-start;">
+          <div style="min-width:110px;padding-top:2px;">
+            <div style="font-size:12px;font-weight:600;color:#f59e0b;white-space:nowrap;">9:45 – 10:00 AM</div>
+          </div>
+          <div class="card" style="flex:1;">
+            <div class="card-body" style="padding:14px 16px;">
+              <div style="font-size:13px;font-weight:600;color:#111;margin-bottom:6px;">☕ Arrive · Breakfast &amp; Coffee</div>
+              <div style="font-size:13px;color:#4b5563;">Everyone arrives, grabs breakfast, coffee, and gets oriented. Food lead does a quick briefing of the plan.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10:00–11:00 prep block -->
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="min-width:110px;padding-top:2px;">
+            <div style="font-size:12px;font-weight:600;color:#f59e0b;white-space:nowrap;">10:00 – 11:00 AM</div>
+          </div>
+          <div class="card" style="flex:1;">
+            <div class="card-body" style="padding:14px 16px;">
+              <div style="font-size:13px;font-weight:600;color:#111;margin-bottom:12px;">🍳 Prep Time</div>
+              <div id="tl-tasks"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email panel -->
+        <div class="card" style="margin-top:18px;">
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+              <div style="font-size:14px;font-weight:600;color:#111;">📧 Send to Team</div>
+              <button id="tl-regen-btn" onclick="tlRegenEmail()" style="display:none;padding:6px 13px;font-size:12px;font-weight:600;border-radius:6px;border:none;background:#f59e0b;color:#000;cursor:pointer;">↻ Regenerate Email</button>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label class="form-label">Draft <span style="font-weight:400;color:#9ca3af;">— edit before sending</span></label>
+              <textarea id="tl-email-draft" class="form-textarea" rows="18" style="font-family:monospace;font-size:12px;line-height:1.6;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:10px;">
+              <label class="form-label">To <span style="font-weight:400;color:#9ca3af;">(comma-separated emails)</span></label>
+              <input type="text" id="tl-emails" class="form-input" placeholder="e.g. sam@church.org, jordan@church.org" />
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button class="btn btn-primary" onclick="sendTimelineEmail()">Send Email</button>
+              <span id="tl-email-error" style="font-size:12px;color:#dc2626;display:none;"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <div id="view-schedule" class="view">
       <div class="view-header">
         <div>
@@ -372,6 +461,22 @@
 </div>
 
 <!-- Add / Edit Menu Modal -->
+<div id="copied-dialog-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:28px 32px;text-align:center;max-width:320px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,0.18);">
+    <div style="font-size:32px;margin-bottom:10px;">✅</div>
+    <div style="font-size:16px;font-weight:600;color:#111;margin-bottom:6px;">Copied Ingredients!</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:20px;">Click the first empty cell in column A, then Cmd+V (or Ctrl+V) to paste.</div>
+    <button onclick="document.getElementById('copied-dialog-overlay').style.display='none';window._openInventorySheet();" class="btn btn-primary" style="width:100%;">Open Inventory Sheet</button>
+  </div>
+</div>
+
+<div id="copied-brief-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:28px 32px;text-align:center;max-width:300px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,0.18);">
+    <div style="font-size:32px;margin-bottom:10px;">✅</div>
+    <div style="font-size:16px;font-weight:600;color:#111;">Copied Ingredients!</div>
+  </div>
+</div>
+
 <div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:12px;width:90%;max-width:680px;max-height:90vh;overflow-y:auto;padding:24px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
@@ -727,6 +832,7 @@ function showView(view) {
   if (view === 'order') renderOrder();
   if (view === 'feedback') { populateFeedbackMenuSelect(); renderFeedbackLog(); }
   if (view === 'schedule') renderSchedule();
+  if (view === 'timeline') populateTimelineMenuSelect();
 }
 
 // ── Menu Library ──────────────────────────────────────────────────────────────
@@ -1011,8 +1117,27 @@ function sendToOrder() {
   if (!selectedMenuId) return;
   orderMenuId = selectedMenuId;
   orderServings = currentServings;
-  showToast('Sent to Costco Order ✓');
-  setTimeout(() => showView('order'), 600);
+
+  // Build sheet rows and copy TSV silently
+  const menu = menus.find(m => m.id === selectedMenuId);
+  const ratio = currentServings / menu.baseServings;
+  _currentSheetRows = buildOrderRows(menu, ratio);
+  const tsv = _currentSheetRows.map(r => [r.meal, r.category, r.item, r.link, r.qty].join('\t')).join('\n');
+
+  const openSheet = () => window.open('https://docs.google.com/spreadsheets/d/1yVdN2gv4nZytP5R6EAp_MqODLCcIOvsMZQ_YEI2C1uc/edit?gid=1359805954#gid=1359805954', '_blank');
+
+  const showCopiedDialog = () => {
+    document.getElementById('copied-dialog-overlay').style.display = 'flex';
+  };
+
+  navigator.clipboard.writeText(tsv).then(showCopiedDialog).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = tsv; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showCopiedDialog();
+  });
+
+  window._openInventorySheet = openSheet;
 }
 
 function showAISuggestions() {
@@ -1024,6 +1149,233 @@ function showAISuggestions() {
     return `- ${ing.name}: ${adj} ${ing.unit}${ing.flagShort ? ' [FLAGGED: ran short before]' : ''}`;
   }).join('\n');
   alert(`AI suggestions are available when connected to the Anthropic API.\n\nCurrent order for ${currentServings} servings:\n\n${lines}\n\nFlagged items may need a 15–20% buffer.`);
+}
+
+// ── Detailed Timeline ─────────────────────────────────────────────────────────
+
+function populateTimelineMenuSelect() {
+  const sel = document.getElementById('tl-menu-select');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Select a menu —</option>' +
+    menus.map(m => `<option value="${m.id}" ${m.id === current ? 'selected' : ''}>${m.name}</option>`).join('');
+}
+
+function tlResetOutput() {
+  document.getElementById('tl-output').style.display = 'none';
+  document.getElementById('tl-error').style.display = 'none';
+}
+
+function parsePrepTasks(prepInstructions) {
+  if (!prepInstructions) return [];
+  const tasks = [];
+  let currentSection = '';
+  prepInstructions.split('\n').forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (trimmed === trimmed.toUpperCase() && !trimmed.startsWith('-')) {
+      currentSection = trimmed.replace(/:/g, '');
+    } else if (trimmed.startsWith('-')) {
+      const task = trimmed.slice(1).trim();
+      if (task) tasks.push({ section: currentSection, task });
+    }
+  });
+  return tasks;
+}
+
+const PERSON_COLORS = [
+  { bg: '#dbeafe', color: '#1e40af' },
+  { bg: '#d1fae5', color: '#065f46' },
+  { bg: '#fef3c7', color: '#92400e' },
+  { bg: '#ede9fe', color: '#5b21b6' },
+  { bg: '#fee2e2', color: '#991b1b' },
+  { bg: '#ffedd5', color: '#9a3412' },
+  { bg: '#f0fdf4', color: '#166534' },
+  { bg: '#fdf4ff', color: '#7e22ce' },
+];
+
+let tlGeneratedSections = null;
+let tlGeneratedMenuName = '';
+
+function generateTimeline() {
+  const errEl = document.getElementById('tl-error');
+  errEl.style.display = 'none';
+
+  const menuId = document.getElementById('tl-menu-select').value;
+  if (!menuId) {
+    errEl.textContent = 'Please select a menu.';
+    errEl.style.display = '';
+    return;
+  }
+
+  const rawNames = document.getElementById('tl-names').value.trim();
+  if (!rawNames) {
+    errEl.textContent = 'Team member names are required.';
+    errEl.style.display = '';
+    return;
+  }
+
+  const names = rawNames.split(',').map(n => n.trim()).filter(Boolean);
+  if (!names.length) {
+    errEl.textContent = 'Enter at least one name.';
+    errEl.style.display = '';
+    return;
+  }
+
+  const menu = menus.find(m => m.id === menuId);
+  const tasks = parsePrepTasks(menu.prepInstructions);
+
+  if (!tasks.length) {
+    errEl.textContent = 'This menu has no prep instructions yet. Add them via Edit Menu.';
+    errEl.style.display = '';
+    return;
+  }
+
+  // Build flat task list with assignments
+  let personIdx = 0;
+  tlTasks = tasks.map(({ section, task }) => {
+    const person = names[personIdx % names.length];
+    const colorSet = PERSON_COLORS[personIdx % PERSON_COLORS.length];
+    personIdx++;
+    return { section, task, person, colorSet };
+  });
+
+  tlGeneratedMenuName = menu.name;
+  renderTlTasks();
+  buildEmailDraft(menu.name);
+  tlSnapshot = tlTasks.map(t => ({ task: t.task, person: t.person }));
+  document.getElementById('tl-regen-btn').style.display = 'none';
+
+  document.getElementById('tl-emails').value = '';
+  document.getElementById('tl-email-error').style.display = 'none';
+  document.getElementById('tl-output').style.display = 'block';
+}
+
+let tlTasks = [];
+let tlDragIdx = null;
+let tlSnapshot = [];
+
+function tlCheckChanges() {
+  const changed = tlTasks.some((t, i) =>
+    t.task !== tlSnapshot[i]?.task || t.person !== tlSnapshot[i]?.person
+  );
+  document.getElementById('tl-regen-btn').style.display = changed ? '' : 'none';
+}
+
+function tlRegenEmail() {
+  buildEmailDraft(tlGeneratedMenuName);
+}
+
+function renderTlTasks() {
+  const el = document.getElementById('tl-tasks');
+  // Group by section for headers, but keep flat index for IDs
+  let html = '';
+  let lastSection = null;
+  tlTasks.forEach((t, i) => {
+    if (t.section !== lastSection) {
+      lastSection = t.section;
+      if (t.section) html += `<div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.07em;margin:14px 0 8px;">${t.section}</div>`;
+    }
+    const isLast = i === tlTasks.length - 1;
+    html += `
+      <div id="tl-row-${i}" data-idx="${i}"
+        style="display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:6px;${isLast ? '' : 'border-bottom:1px solid #f3f4f6;'}"
+        ondragover="tlDragOver(event,${i})" ondragleave="tlDragLeave(event,${i})" ondrop="tlDrop(event,${i})">
+        <span
+          contenteditable="true"
+          onfocus="this.style.background='#fffbeb';this.style.boxShadow='0 0 0 2px #f59e0b60';this.style.borderColor='#f59e0b'"
+          onblur="tlTasks[${i}].task=this.textContent.trim();this.style.background='';this.style.boxShadow='';this.style.borderColor='#e5e7eb';tlCheckChanges()"
+          style="flex:1;font-size:13px;color:#374151;outline:none;border-radius:5px;padding:4px 8px;cursor:text;border:1px dashed #e5e7eb;transition:border-color 0.15s,background 0.15s;"
+          title="Click to edit task"
+        >${t.task}</span>
+        <span
+          draggable="true"
+          data-idx="${i}"
+          ondragstart="tlDragStart(event,${i})"
+          ondragend="tlDragEnd()"
+          style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px 3px 6px;border-radius:4px;background:${t.colorSet.bg};color:${t.colorSet.color};white-space:nowrap;cursor:grab;user-select:none;border:1px solid ${t.colorSet.color}30;"
+          title="Drag to reassign"
+        ><span style="font-size:10px;opacity:0.5;letter-spacing:-1px;">⠿</span>${t.person}</span>
+      </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function tlDragStart(e, idx) {
+  tlDragIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => {
+    const badge = e.target;
+    badge.style.opacity = '0.4';
+  }, 0);
+}
+
+function tlDragEnd() {
+  document.querySelectorAll('#tl-tasks [data-idx]').forEach(el => {
+    el.style.opacity = '';
+  });
+  document.querySelectorAll('#tl-tasks [id^="tl-row-"]').forEach(row => {
+    row.style.background = '';
+  });
+  tlDragIdx = null;
+}
+
+function tlDragOver(e, idx) {
+  if (tlDragIdx === null || tlDragIdx === idx) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.getElementById('tl-row-' + idx).style.background = '#fffbeb';
+}
+
+function tlDragLeave(e, idx) {
+  document.getElementById('tl-row-' + idx).style.background = '';
+}
+
+function tlDrop(e, idx) {
+  e.preventDefault();
+  if (tlDragIdx === null || tlDragIdx === idx) return;
+  // Swap only person + colorSet, keep task text
+  const tmp = { person: tlTasks[tlDragIdx].person, colorSet: tlTasks[tlDragIdx].colorSet };
+  tlTasks[tlDragIdx].person = tlTasks[idx].person;
+  tlTasks[tlDragIdx].colorSet = tlTasks[idx].colorSet;
+  tlTasks[idx].person = tmp.person;
+  tlTasks[idx].colorSet = tmp.colorSet;
+  tlDragIdx = null;
+  renderTlTasks();
+  tlCheckChanges();
+}
+
+function buildEmailDraft(menuName) {
+  let body = `Hi team,\n\nHere's our plan for Sunday. Please make note of your assignments and come ready to move!\n\n`;
+  body += `────────────────────────\n9:45 AM – Arrive\n────────────────────────\n`;
+  body += `Please arrive by 9:45 AM to grab breakfast and coffee. The food lead will do a quick briefing of the plan before we get started.\n\n`;
+  body += `────────────────────────\n10:00 AM – 11:00 AM: Prep Time\n────────────────────────\n`;
+  body += `Menu: ${menuName}\n\n`;
+  let lastSection = null;
+  tlTasks.forEach(({ section, task, person }) => {
+    if (section !== lastSection) { lastSection = section; if (section) body += `[ ${section} ]\n`; }
+    body += `  • ${task}  →  ${person}\n`;
+  });
+  body += `\n────────────────────────\nThank you for serving with us! See you Sunday.\n\nSVC Food Team`;
+  document.getElementById('tl-email-draft').value = body;
+}
+
+function sendTimelineEmail() {
+  const errEl = document.getElementById('tl-email-error');
+  errEl.style.display = 'none';
+
+  const rawEmails = document.getElementById('tl-emails').value.trim();
+  if (!rawEmails) {
+    errEl.textContent = 'Please enter at least one email address.';
+    errEl.style.display = '';
+    return;
+  }
+
+  const emails = rawEmails.split(',').map(e => e.trim()).filter(Boolean);
+  const subject = `Food Team – Sunday Schedule & Prep Assignments (${tlGeneratedMenuName})`;
+
+  const body = document.getElementById('tl-email-draft').value;
+  const mailto = `mailto:${emails.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
 }
 
 // ── Add / Edit Menu Modal ─────────────────────────────────────────────────────
@@ -1265,51 +1617,24 @@ function copySheet() {
   });
 }
 
+function showCopiedBrief() {
+  const el = document.getElementById('copied-brief-overlay');
+  el.style.display = 'flex';
+  setTimeout(() => { el.style.display = 'none'; }, 1500);
+}
+
 function copyForSheetFromLibrary() {
   if (!selectedMenuId) return;
   const menu = menus.find(m => m.id === selectedMenuId);
   const ratio = currentServings / menu.baseServings;
   _currentSheetRows = buildOrderRows(menu, ratio);
-
-  const tbody = document.getElementById('sheet-preview-body');
-  tbody.innerHTML = _currentSheetRows.map((r, i) => {
-    const bg = i % 2 === 0 ? '#fff' : '#f9fafb';
-    const linkCell = r.link
-      ? `<a href="${r.link}" target="_blank" style="color:#2563eb;font-size:11px;word-break:break-all;">${r.link.replace('https://www.costcobusinessdelivery.com/', 'costcobiz/…')}</a>`
-      : '<span style="color:#9ca3af;font-size:11px;">no link</span>';
-    const flag = r.flagShort ? ' <span style="color:#dc2626;font-size:10px;">⚠</span>' : '';
-    return `<tr style="background:${bg};border-bottom:1px solid #f3f4f6;">
-      <td style="padding:6px 10px;color:#6b7280;white-space:nowrap;">${r.meal}</td>
-      <td style="padding:6px 10px;color:#6b7280;white-space:nowrap;">${r.category}</td>
-      <td style="padding:6px 10px;font-weight:500;color:#111;white-space:nowrap;">${r.item}${flag}</td>
-      <td style="padding:6px 10px;max-width:180px;">${linkCell}</td>
-      <td style="padding:6px 10px;font-weight:700;color:#d97706;white-space:nowrap;">${r.qty}</td>
-    </tr>`;
-  }).join('');
-
-  const divider = '─'.repeat(58);
-  const date = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
-  const costcoItems = _currentSheetRows.filter(r => r.isCostco);
-  const otherItems = _currentSheetRows.filter(r => !r.isCostco);
-  const costcoLines = costcoItems.map(r => {
-    const flag = r.flagShort ? ' ⚠ ran short before — order extra' : '';
-    const urlLine = r.link ? `     🔗 ${r.link}` : '     (search on site)';
-    return `[ ] ${r.item}${flag}\n     ORDER: ${r.qty}\n${urlLine}`;
-  }).join('\n\n');
-  const otherLines = otherItems.length
-    ? otherItems.map(r => `[ ] ${r.item}  —  ${r.qty}  (${r.store})`).join('\n') : '(none)';
-  document.getElementById('print-text').value = [
-    `SVC FOOD OPS — THURSDAY ORDER`,
-    `Menu: ${menu.name}  |  Servings: ${currentServings}`,
-    date, '', divider,
-    `COSTCO BUSINESS (${costcoItems.length} items)`,
-    `Open each link → type qty shown → Add to Cart`,
-    divider, '', costcoLines, '',
-    divider, `OTHER STORES (${otherItems.length} items)`, divider, otherLines,
-  ].join('\n');
-
-  switchTab('sheet');
-  document.getElementById('print-overlay').style.display = 'flex';
+  const tsv = _currentSheetRows.map(r => [r.meal, r.category, r.item, r.link, r.qty].join('\t')).join('\n');
+  navigator.clipboard.writeText(tsv).then(showCopiedBrief).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = tsv; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showCopiedBrief();
+  });
 }
 
 function copyOrder() { copySheet(); }
