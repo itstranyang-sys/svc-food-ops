@@ -222,7 +222,7 @@
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
         <div style="position:relative;flex:1;min-width:180px;max-width:300px;">
           <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:13px;pointer-events:none;">🔍</span>
-          <input type="text" id="menu-search" placeholder="Search menus…" oninput="renderMenuCards()" style="width:100%;padding:7px 10px 7px 30px;font-size:13px;border:1px solid #d1d5db;border-radius:7px;font-family:inherit;color:#111;background:#fff;" onfocus="this.style.borderColor='#f59e0b';this.style.boxShadow='0 0 0 3px rgba(245,158,11,0.15)'" onblur="this.style.borderColor='#d1d5db';this.style.boxShadow='none'" />
+          <input type="text" id="menu-search" placeholder="Search menus…" oninput="menuPage=0;renderMenuCards()" style="width:100%;padding:7px 10px 7px 30px;font-size:13px;border:1px solid #d1d5db;border-radius:7px;font-family:inherit;color:#111;background:#fff;" onfocus="this.style.borderColor='#f59e0b';this.style.boxShadow='0 0 0 3px rgba(245,158,11,0.15)'" onblur="this.style.borderColor='#d1d5db';this.style.boxShadow='none'" />
         </div>
         <div class="filter-dropdown" id="filter-dropdown">
           <button class="filter-trigger" id="filter-trigger" onclick="toggleFilterPanel(event)">
@@ -244,6 +244,7 @@
         </div>
       </div>
       <div id="menu-cards" class="menu-grid"></div>
+      <div id="menu-pagination" style="display:none;align-items:center;justify-content:space-between;margin-bottom:16px;font-size:13px;color:#6b7280;"></div>
       <div id="menu-detail" class="card">
         <div class="card-body">
           <div class="detail-header">
@@ -734,6 +735,8 @@ const DIFF_LEVELS = ['easy','medium','hard','special'];
 const DIFF_LABELS = { easy:'Easy', medium:'Medium', hard:'Hard', special:'Special occasion' };
 
 let activeFilter = 'all';
+let menuPage = 0;
+const MENUS_PER_PAGE = 10;
 
 const FILTER_LABELS = { all: 'All', easy: 'Easy', medium: 'Medium', hard: 'Hard', special: 'Special occasion', unset: 'Unset', catered: 'Catered' };
 
@@ -747,6 +750,7 @@ function toggleFilterPanel(e) {
 
 function setFilter(filter) {
   activeFilter = filter;
+  menuPage = 0;
   document.querySelectorAll('.filter-option').forEach(opt => {
     opt.classList.toggle('active', opt.dataset.filter === filter);
   });
@@ -812,9 +816,27 @@ function renderMenuCards() {
   });
   if (!filtered.length) {
     c.innerHTML = `<div style="grid-column:1/-1;padding:32px;text-align:center;color:#9ca3af;font-size:13px;">No menus match this filter.</div>`;
+    document.getElementById('menu-pagination').style.display = 'none';
     return;
   }
-  c.innerHTML = filtered.map(m => {
+  const totalPages = Math.ceil(filtered.length / MENUS_PER_PAGE);
+  if (menuPage >= totalPages) menuPage = totalPages - 1;
+  const page = filtered.slice(menuPage * MENUS_PER_PAGE, (menuPage + 1) * MENUS_PER_PAGE);
+
+  const pag = document.getElementById('menu-pagination');
+  if (totalPages > 1) {
+    pag.style.display = 'flex';
+    pag.innerHTML = `
+      <span>Showing ${menuPage * MENUS_PER_PAGE + 1}–${Math.min((menuPage + 1) * MENUS_PER_PAGE, filtered.length)} of ${filtered.length}</span>
+      <div style="display:flex;gap:6px;">
+        <button onclick="menuPage--;renderMenuCards()" ${menuPage === 0 ? 'disabled' : ''} style="padding:4px 10px;border-radius:6px;border:1px solid #d1d5db;background:#fff;font-size:12px;cursor:pointer;${menuPage === 0 ? 'opacity:0.4;cursor:default;' : ''}">← Prev</button>
+        <button onclick="menuPage++;renderMenuCards()" ${menuPage >= totalPages - 1 ? 'disabled' : ''} style="padding:4px 10px;border-radius:6px;border:1px solid #d1d5db;background:#fff;font-size:12px;cursor:pointer;${menuPage >= totalPages - 1 ? 'opacity:0.4;cursor:default;' : ''}">Next →</button>
+      </div>`;
+  } else {
+    pag.style.display = 'none';
+  }
+
+  c.innerHTML = page.map(m => {
     const DIFF_COLORS = { easy:'#d1fae5;color:#065f46', medium:'#fef3c7;color:#92400e', hard:'#fee2e2;color:#991b1b', special:'#ede9fe;color:#5b21b6' };
     const diffBadge = m.difficulty
       ? `<span style="display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;background:${DIFF_COLORS[m.difficulty].split(';')[0]};${DIFF_COLORS[m.difficulty].split(';')[1]};">${DIFF_LABELS[m.difficulty]}</span>`
