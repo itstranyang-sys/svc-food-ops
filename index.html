@@ -515,7 +515,7 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco', name:'Chicken Broth (Swanson)', baseQty:12, unit:'cans', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/swanson-natural-goodness-chicken-broth,-less-sodium,-14.5-oz,-12-ct.product.100122115.html' },
       { store:'Costco', name:'Pre-cut Potatoes', baseQty:5, unit:'count (25lbs)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/flav-r-pac-diced-red-potatoes,-5-lbs.product.11664495.html' },
       { store:'Costco', name:'Bag Frozen Mixed Vegetables', baseQty:4, unit:'count (15 lbs)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-organic-mixed-vegetables,-5-lbs.product.100351236.html' },
-      { store:'Safeway', name:'Cream of Chicken', baseQty:12, unit:'cans', notes:'', flagShort:false },
+      { store:'Smart & Final', name:"Campbell's Cream of Chicken, Condensed, Family Size (22.6oz)", baseQty:6, unit:'cans', notes:'Family size (22.6oz); equivalent to ~12 standard cans', flagShort:false, url:'https://www.smartandfinal.com/product/campbells-condensed-soup-cream-of-chicken-family-size-id-00051000212436' },
       { store:'Costco', name:'Hawaiian Sweet Rolls', baseQty:10, unit:'count', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/p/-/kirkland-signature-sweet-hawaiian-rolls-36-count/100441835' },
       { store:'Walsh', name:'Garlic Salt or Salt to taste', baseQty:1, unit:'to taste', notes:'Check Walsh', flagShort:false },
       { store:'Walsh', name:'Chicken Bouillon', baseQty:1, unit:'to taste', notes:'Check Walsh; if not add salt and pepper', flagShort:false },
@@ -598,7 +598,7 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco', name:'Meatballs (Kirkland, 6lb ~140ct)', baseQty:10, unit:'bags', notes:'Check Walsh; ~2 bags per rice cooker', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-meatballs,-italian-style-beef,-6-lbs.product.10182018.html' },
       { store:'Costco', name:'Mozzarella Cheese', baseQty:2, unit:'bags', notes:'Defrost before Sunday', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-mozzarella-cheese,-shredded,-2.5-lbs,-2-ct.product.100316460.html' },
       { store:'Costco', name:'Prego Pasta Sauce (3-pack, 45oz each)', baseQty:4, unit:'3-packs', notes:'Check Walsh freezer; ~1.5 bottles per cooker', flagShort:false, url:'https://www.costcobusinessdelivery.com/prego-pasta-sauce,-traditional-lower-sodium,-45-oz,-3-ct.product.100373058.html' },
-      { store:'Smart and Final', name:'Penne Pasta', baseQty:5, unit:'boxes', notes:'For A2K food', flagShort:false },
+      { store:'Smart and Final', name:'Penne Pasta', baseQty:5, unit:'boxes', notes:'For A2K food', flagShort:false, url:'https://www.smartandfinal.com/product/barilla-penne-nongmo-pasta-made-with-durum-wheat-semolina-%26-kosher-certified-pasta-id-00076808280739' },
       { store:'Costco', name:'Potato Chips', baseQty:4, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/ruffles-potato-chips,-original,-28-oz.product.11905216.html' },
     ]
   },
@@ -624,13 +624,13 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco Business', name:'Diced Pork Adobada', baseQty:50, unit:'lbs', notes:'~$50 for 20 lbs. Ask Angela to order.', flagShort:false },
       { store:'Costco or Smart & Final', name:'Shredded Iceberg Lettuce', baseQty:2, unit:'5lb bag', notes:'', flagShort:false },
       { store:'Costco or Smart & Final', name:'Sour Cream', baseQty:3, unit:'tub (5 lbs)', notes:'Check Walsh before purchasing', flagShort:false },
-      { store:'Smart and Final', name:'Shredded Mexican Cheese', baseQty:1, unit:'pack (2 count)', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Smart and Final', name:'Shredded Mexican Cheese', baseQty:1, unit:'pack (2 count)', notes:'Check Walsh before purchasing', flagShort:false, url:'https://www.smartandfinal.com/product/first-street-cheese-mexican-style-blend-fancy-shredded-id-00041512061134' },
       { store:'Costco Business', name:'Black Beans', baseQty:1, unit:'case (8pk)', notes:'Check Walsh before purchasing', flagShort:false },
       { store:'Costco Business', name:'Canned Corn', baseQty:1, unit:'case (12 count)', notes:'Check Walsh before purchasing', flagShort:false },
       { store:'Costco Business', name:'Tortilla Chips', baseQty:1, unit:'bag (5 lbs)', notes:'Check Walsh before purchasing', flagShort:false },
       { store:'Costco Business', name:'Guac', baseQty:4, unit:'packs (15oz 3-count)', notes:'Check Walsh before purchasing', flagShort:false },
-      { store:'Smart & Final', name:'Salsa', baseQty:1, unit:'pack (2 jugs)', notes:'Check Walsh before purchasing', flagShort:false },
-      { store:'Smart & Final', name:'Tomato Chicken Bouillon', baseQty:1, unit:'bottle', notes:'Check Walsh before purchasing', flagShort:false },
+      { store:'Smart & Final', name:'Salsa', baseQty:1, unit:'pack (2 jugs)', notes:'Check Walsh before purchasing', flagShort:false, url:'https://www.smartandfinal.com/product/herdez-mild-salsa-verde-id-00072878621441' },
+      { store:'Smart & Final', name:'Tomato Chicken Bouillon', baseQty:1, unit:'bottle', notes:'Check Walsh before purchasing', flagShort:false, url:'https://www.smartandfinal.com/product/knorr-bouillon-tomato-with-chicken-flavor-id-00048001011656' },
       { store:'Costco Business', name:'Shallots', baseQty:1, unit:'count (3 lbs)', notes:'', flagShort:false },
       { store:'Costco Business', name:'Tomatoes', baseQty:1, unit:'count (4 lbs)', notes:'', flagShort:false },
       { store:'Costco Business', name:'Lime', baseQty:1, unit:'bag', notes:'', flagShort:false },
@@ -646,12 +646,12 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco', name:'Pulled Pork', baseQty:18, unit:'boxes', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-smoked-pulled-pork,-rubbed-with-seasonings,-32-oz.product.2001139710.html' },
       { store:'Costco', name:'BBQ Sauce', baseQty:2, unit:'packs (2 bottles)', notes:'Check Walsh before buying', flagShort:false, url:'https://www.costcobusinessdelivery.com/Sweet-Baby-Rays-Barbecue-Sauce,-160-oz.product.11765667.html' },
       { store:'Costco', name:'Hoagie Rolls (Francisco, 12ct)', baseQty:10, unit:'bags', packSize:12, packUnit:'bag (12 rolls)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/francisco-gourmet-sesame-seed-hoagie-rolls,-12-ct.product.11091691.html' },
-      { store:'Smart and Final', name:'Coleslaw Salad', baseQty:3, unit:'bags (5lb)', notes:'', flagShort:false },
-      { store:'Smart and Final', name:'Coleslaw Dressing', baseQty:2, unit:'bottles (3.78L)', notes:'', flagShort:false },
+      { store:'Smart and Final', name:'Coleslaw Salad', baseQty:3, unit:'bags (5lb)', notes:'', flagShort:false, url:'https://www.smartandfinal.com/product/first-street-coleslaw-id-00041512162664' },
+      { store:'Smart and Final', name:'Coleslaw Dressing', baseQty:2, unit:'bottles (3.78L)', notes:'', flagShort:false, url:'https://www.smartandfinal.com/product/hellmanns-coleslaw-dressing-id-00048001203518' },
       { store:'Costco', name:'Kettle Chips', baseQty:4, unit:'bags', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-krinkle-cut-kettle-chips,-himalayan-salt,-32-oz.product.100345834.html' },
       { store:'Costco', name:'Rotisserie Chicken', baseQty:5, unit:'chickens', notes:'For A2K', flagShort:false, url:'https://www.costcobusinessdelivery.com/rotisserie-chicken,-8-ct.product.100455326.html' },
       { store:'Walsh', name:'Yoshida Sauce', baseQty:1, unit:'leftover', notes:'Have leftover Yoshida at Walsh', flagShort:false },
-      { store:'Smart and Final', name:'Green Onion', baseQty:1, unit:'bunch', notes:'', flagShort:false },
+      { store:'Smart and Final', name:'Green Onion', baseQty:1, unit:'bunch', notes:'', flagShort:false, url:'https://www.smartandfinal.com/sm/pickup/rsid/522/product/green-onions-id-00000000004068' },
       { store:'Walsh', name:'Rice', baseQty:1, unit:'12 cups', notes:'', flagShort:false },
       { store:'Costco', name:'Spring Mix', baseQty:1, unit:'box (3lb)', notes:'For A2K?', flagShort:false, url:'https://www.costcobusinessdelivery.com/spring-salad-mix,-3-lbs.product.11680039.html' },
     ]
@@ -683,7 +683,7 @@ let menus = JSON.parse(localStorage.getItem('svc_menus') || 'null') || [
       { store:'Costco', name:'Romaine Lettuce', baseQty:3, unit:'bags (6ct)', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/romaine-lettuce-hearts,-6-ct.product.10181240.html' },
       { store:'Costco', name:'Shredded Parmigiano', baseQty:2, unit:'boxes', notes:'', flagShort:false, url:'https://www.costcobusinessdelivery.com/kirkland-signature-aged-parmigiano-reggiano-cheese,-shredded,-1-lb.product.11906214.html' },
       { store:'Costco', name:'Croutons', baseQty:2, unit:'bags', notes:'Add day-of so they stay crunchy', flagShort:false, url:'https://www.costcobusinessdelivery.com/fresh-gourmet-seasoned-organic-croutons,-2-lbs.product.100146053.html' },
-      { store:'Smart & Final', name:'Caesar Dressing', baseQty:3, unit:'bottles', notes:'', flagShort:false },
+      { store:'Smart & Final', name:'Caesar Dressing', baseQty:3, unit:'bottles', notes:'', flagShort:false, url:'https://www.smartandfinal.com/product/hlmn-classic-caesar-4p-1gal-id-00048001257221' },
     ]
   },
 ];
@@ -701,6 +701,7 @@ function save() {
   localStorage.setItem('svc_feedback', JSON.stringify(feedbackLog));
   localStorage.setItem('svc_schedule', JSON.stringify(scheduleData));
 }
+
 
 function getDefaultSchedule() {
   const sundays = [];
@@ -938,7 +939,7 @@ function renderIngredients(menu, servings) {
     <th>Notes</th>
     <th></th>
   `;
-  tbody.innerHTML = menu.ingredients.map(ing => {
+  tbody.innerHTML = menu.ingredients.map((ing, ingIdx) => {
     const { rawAdj, packsToBuy, hasPackSize, fixed } = calcBuy(ing, ratio);
     const changed = !fixed && Math.abs(rawAdj - ing.baseQty) > 0.05;
     const flagHTML = ing.flagShort ? '<span class="tag tag-danger" style="font-size:10px;">ran short</span>' : '';
